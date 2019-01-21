@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+
+    </data>
+    <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:background="@android:color/white"
+            android:padding="4dp"
+            android:layout_height="wrap_content">
+
+        <ImageView
+                android:id="@+id/iv_appIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/icon"/>
+
+        <TextView
+                android:id="@+id/tv_appName"
+                style="@style/commonTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/common_margin"
+                android:layout_marginTop="@dimen/common_margin"
+                app:layout_constraintStart_toEndOf="@id/iv_appIcon"
+                app:layout_constraintTop_toTopOf="@id/iv_appIcon"
+                tools:text="leavesC"/>
+
+        <TextView
+                android:id="@+id/tv_appPackageName"
+                style="@style/commonTextStyle"
+                app:layout_constraintTop_toBottomOf="@id/tv_appName"
+                android:layout_marginLeft="@dimen/common_margin"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/common_margin"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/iv_appIcon"
+                tools:text="leavesC.hello.activity"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
