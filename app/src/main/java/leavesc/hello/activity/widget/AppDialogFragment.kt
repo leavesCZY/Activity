@@ -18,7 +18,6 @@ import leavesc.hello.activity.databinding.DialogAppShareBinding
 import leavesc.hello.activity.model.ApplicationLocal
 import java.io.File
 
-
 /**
  * 作者：leavesC
  * 时间：2019/1/18 0:07
@@ -36,7 +35,7 @@ class AppDialogFragment : DialogFragment() {
             DataBindingUtil.inflate(
                 LayoutInflater.from(context),
                 R.layout.dialog_app_share, null, false
-            );
+            )
         bind.applicationLocal = applicationInfo
         bind.ivAppSettings.setOnClickListener {
             openAppSettings(context!!, applicationInfo.packageName)

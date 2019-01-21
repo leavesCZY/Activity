@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                     value?.let {
                         if (it.isNotEmpty()) {
                             val find = AppInfoHolder.getAllApplication(this@MainActivity).find {
-                                it.name.contains(value)
+                                it.name.toLowerCase().contains(value.toLowerCase())
                             }
                             if (find == null) {
                                 Toast.makeText(this@MainActivity, "没有找到应用", Toast.LENGTH_SHORT).show()
