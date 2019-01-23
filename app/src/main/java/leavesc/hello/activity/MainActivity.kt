@@ -172,4 +172,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //跳转到设置页面无障碍服务开启自定义辅助功能服务
+    fun jumpToSettingPage(context: Context) {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+
 }

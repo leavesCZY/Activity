@@ -1,31 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="leavesc.hello.activity">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="leavesc.hello.activity">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
+            android:name=".BaseApplication"
             android:allowBackup="true"
             android:icon="@mipmap/icon"
             android:label="@string/app_name"
-            android:name=".BaseApplication"
             android:roundIcon="@mipmap/icon"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity"
-                  android:configChanges="keyboardHidden|orientation|screenSize"
-                  android:screenOrientation="portrait"
-                  android:windowSoftInputMode="adjustUnspecified|stateHidden">
+            android:theme="@style/AppTheme"
+            tools:ignore="GoogleAppIndexingWarning">
+        <activity
+                android:name=".MainActivity"
+                android:configChanges="keyboardHidden|orientation|screenSize"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="adjustUnspecified|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <service
                 android:name=".service.ActivityService"
                 android:enabled="true"
                 android:exported="true">
+        </service>
+        <service
+                android:name=".service.ActivityAccessibilityService"
+                android:exported="true"
+                android:label="AccessibilityTestService"
+                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.accessibilityservice"
+                    android:resource="@xml/accessibility_config" />
         </service>
     </application>
 
