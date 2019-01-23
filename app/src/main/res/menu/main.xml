@@ -23,4 +23,9 @@
           android:title="用户应用"
           app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_currentActivity"
+          android:orderInCategory="4"
+          android:title="当前Activity"
+          app:showAsAction="never"/>
+
 </menu>

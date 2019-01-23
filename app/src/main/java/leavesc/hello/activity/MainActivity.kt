@@ -1,9 +1,12 @@
 package leavesc.hello.activity
 
 import android.content.Context
+import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
@@ -16,10 +19,10 @@ import leavesc.hello.activity.adapter.AppRecyclerAdapter
 import leavesc.hello.activity.databinding.ActivityMainBinding
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
+import leavesc.hello.activity.service.ActivityService
 import leavesc.hello.activity.utils.SoftKeyboardUtils
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
-
 
 /**
  * 作者：leavesC
@@ -37,6 +40,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appRecyclerAdapter: AppRecyclerAdapter
 
     private lateinit var activityMainBinding: ActivityMainBinding
+
+    private val REQUEST_CODE_OVERLAYS = 10
 
     private inner class InitAppAsyncTask : AsyncTask<Context, Void, MutableList<ApplicationLocal>>() {
 
@@ -129,11 +134,42 @@ class MainActivity : AppCompatActivity() {
                     appList.clear()
                     appList.addAll(AppInfoHolder.getAllNonSystemApplication(this@MainActivity))
                 }
+                R.id.menu_currentActivity -> {
+                    showWindow()
+                }
             }
             appRecyclerAdapter.notifyDataSetChanged()
         }
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showWindow() {
+        if (appCanDrawOverlays(this)) {
+            startWindowService()
+        } else {
+            startActivityForResult(
+                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${BuildConfig.APPLICATION_ID}")),
+                REQUEST_CODE_OVERLAYS
+            )
+        }
+    }
+
+    private fun startWindowService() {
+        startService(Intent(this, ActivityService::class.java))
+    }
+
+    private fun appCanDrawOverlays(context: Context) = Settings.canDrawOverlays(context)
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_CODE_OVERLAYS -> {
+                if (appCanDrawOverlays(this)) {
+                    startWindowService()
+                } else {
+                    Toast.makeText(this, "请授予弹出悬浮窗的权限", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
 }
