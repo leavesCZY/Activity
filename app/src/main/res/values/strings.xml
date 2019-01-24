@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Activity</string>
+    <string name="accessibilityDescription">辅助服务，用于查看系统当前顶层Activity</string>
 </resources>

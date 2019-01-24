@@ -22,6 +22,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:paddingBottom="4dp"
+                android:textColor="#06101b"
                 android:layout_height="wrap_content"/>
 
         <ImageView
@@ -61,7 +62,9 @@
                 tools:listitem="@layout/item_app_activity"
                 app:layout_constrainedHeight="true"
                 android:scrollbars="vertical"
-                android:layout_height="100dp"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@android:color/transparent"
+                android:layout_height="80dp"/>
 
     </android.support.constraint.ConstraintLayout>
 

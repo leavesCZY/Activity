@@ -1,21 +1,21 @@
 package leavesc.hello.activity.service
 
+import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Build
-import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.*
+import android.view.accessibility.AccessibilityEvent
 import android.widget.SeekBar
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
 
-class ActivityService : Service() {
+class ActivityService : AccessibilityService() {
 
     private val TAG = "ActivityService"
 
@@ -25,16 +25,44 @@ class ActivityService : Service() {
 
     private var view: View? = null
 
-    override fun onCreate() {
-        super.onCreate()
+    private lateinit var layoutActivityWindowBinding: LayoutActivityWindowBinding;
+
+    private val activityList = mutableListOf<String>()
+
+    private val activityRecyclerAdapter = ActivityRecyclerAdapter()
+
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        showFloatingWindow()
+    }
+
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        event?.let {
+            val eventType = event.eventType
+            if (eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED || eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
+                layoutActivityWindowBinding.tvAppName.text = event.packageName
+                event.className?.let {
+                    activityList.add(event.className.toString())
+                    activityRecyclerAdapter.notifyDataSetChanged()
+                    layoutActivityWindowBinding.rvActivityList.scrollToPosition(activityRecyclerAdapter.itemCount - 1)
+                }
+            }
+        }
+    }
+
+    override fun onInterrupt() {
+        view?.let {
+            windowManager.removeView(view)
+            view = null
+        }
+        stopSelf()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        showFloatingWindow()
+
         return START_NOT_STICKY
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun showFloatingWindow() {
         if (view == null) {
             initView()
@@ -43,8 +71,8 @@ class ActivityService : Service() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
-        val layoutActivityWindowBinding: LayoutActivityWindowBinding =
-            DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.layout_activity_window, null, false)
+        layoutActivityWindowBinding =
+                DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.layout_activity_window, null, false)
         layoutActivityWindowBinding.ivExtendsWindow.setOnClickListener {
             if (layoutActivityWindowBinding.rvActivityList.visibility == View.GONE) {
                 layoutActivityWindowBinding.rvActivityList.visibility = View.VISIBLE
@@ -64,34 +92,25 @@ class ActivityService : Service() {
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 //                view?.background?.alpha = progress
-                Log.e(TAG, "onProgressChanged: " + progress)
+                Log.e(TAG, "onProgressChanged: $progress")
             }
         })
-
-        val activityList = MutableList(30) {
-            it.toString()
-        }
-        val activityRecyclerAdapter = ActivityRecyclerAdapter()
         activityRecyclerAdapter.activityList = activityList
         layoutActivityWindowBinding.rvActivityList.adapter = activityRecyclerAdapter
         layoutActivityWindowBinding.rvActivityList.layoutManager = LinearLayoutManager(this)
-
-        view = layoutActivityWindowBinding.root
-        view?.setOnTouchListener(FloatingOnTouchListener())
-
         layoutParams = WindowManager.LayoutParams()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
             layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE
         }
-//        layoutParams.format = PixelFormat.RGBA_8888
         layoutParams.gravity = Gravity.START or Gravity.TOP
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-
+        view = layoutActivityWindowBinding.root
+        view?.setOnTouchListener(FloatingOnTouchListener())
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(view, layoutParams)
     }
@@ -123,18 +142,6 @@ class ActivityService : Service() {
             }
             return false
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        view?.let {
-            windowManager.removeView(view)
-            view = null
-        }
-    }
-
-    override fun onBind(intent: Intent): IBinder? {
-        return null
     }
 
 }
