@@ -34,32 +34,43 @@ class ActivityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         showFloatingWindow()
+        Log.e(TAG, "onServiceConnected()")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        event?.let {
-            val eventType = event.eventType
-            if (eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED || eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
-                layoutActivityWindowBinding.tvAppName.text = event.packageName
-                event.className?.let {
-                    activityList.add(event.className.toString())
-                    activityRecyclerAdapter.notifyDataSetChanged()
-                    layoutActivityWindowBinding.rvActivityList.scrollToPosition(activityRecyclerAdapter.itemCount - 1)
+        view?.let { _ ->
+            event?.let {
+                val eventType = event.eventType
+                if (eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED || eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
+                    layoutActivityWindowBinding.tvAppName.text = event.packageName
+                    event.className?.let {
+                        activityList.add(event.className.toString())
+                        activityRecyclerAdapter.notifyDataSetChanged()
+                        layoutActivityWindowBinding.rvActivityList.scrollToPosition(activityRecyclerAdapter.itemCount - 1)
+                    }
                 }
             }
         }
     }
 
     override fun onInterrupt() {
+        Log.e(TAG, "onInterrupt()")
+        clean()
+    }
+
+    private fun clean() {
         view?.let {
             windowManager.removeView(view)
             view = null
         }
-        stopSelf()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e(TAG, "onDestroy()")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         return START_NOT_STICKY
     }
 
@@ -81,6 +92,15 @@ class ActivityService : AccessibilityService() {
             }
         }
         layoutActivityWindowBinding.ivRemoveWindow.setOnClickListener {
+            //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                disableSelf()
+//                clean()
+//                Log.e(TAG, "disableSelf()")
+//            } else {
+//                Log.e(TAG, "view?.visibility = View.GONE")
+//                view?.visibility = View.GONE
+//            }
+            clean()
             stopSelf()
         }
         layoutActivityWindowBinding.seekBarBg.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

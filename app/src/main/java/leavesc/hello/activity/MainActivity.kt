@@ -1,6 +1,7 @@
 package leavesc.hello.activity
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.net.Uri
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.MenuItemCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
@@ -20,6 +22,7 @@ import leavesc.hello.activity.databinding.ActivityMainBinding
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
 import leavesc.hello.activity.service.ActivityService
+import leavesc.hello.activity.utils.AccessibilityServiceUtils
 import leavesc.hello.activity.utils.SoftKeyboardUtils
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
@@ -135,7 +138,12 @@ class MainActivity : AppCompatActivity() {
                     appList.addAll(AppInfoHolder.getAllNonSystemApplication(this@MainActivity))
                 }
                 R.id.menu_currentActivity -> {
-                    showWindow()
+                    if (AccessibilityServiceUtils.isEnabled(this@MainActivity, ActivityService::class.java)) {
+                        Toast.makeText(this@MainActivity, "已启用", Toast.LENGTH_SHORT).show()
+                    } else {
+                        jumpToSettingPage(this@MainActivity)
+                    }
+//                    showWindow()
                 }
             }
             appRecyclerAdapter.notifyDataSetChanged()
