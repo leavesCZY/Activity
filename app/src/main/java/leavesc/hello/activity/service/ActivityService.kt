@@ -7,13 +7,14 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
-import android.widget.SeekBar
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
+import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.utils.PermissionUtils
 
 /**
@@ -45,14 +46,20 @@ class ActivityService : AccessibilityService() {
         Log.e(TAG, "onServiceConnected()")
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         Log.e(TAG, "onAccessibilityEvent()")
         view?.let {
             event?.let {
                 val eventType = event.eventType
                 if (eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED || eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
-                    layoutActivityWindowBinding.tvAppName.text = event.packageName
+                    val appName = AppInfoHolder.getAppName(event.packageName.toString())
+                    layoutActivityWindowBinding.tvAppName.text = event.packageName.toString() +
+                            if (TextUtils.isEmpty(appName)) "" else "（${appName}）"
                     event.className?.let {
+                        if (activityList.size > 50) {
+                            activityList.removeAll(activityList.subList(0, 10))
+                        }
                         activityList.add(event.className.toString())
                         activityRecyclerAdapter.notifyDataSetChanged()
                         layoutActivityWindowBinding.rvActivityList.scrollToPosition(activityRecyclerAdapter.itemCount - 1)
@@ -115,18 +122,6 @@ class ActivityService : AccessibilityService() {
                 clean()
             }
         }
-        layoutActivityWindowBinding.seekBarBg.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                view?.background?.alpha = progress
-                Log.e(TAG, "onProgressChanged: $progress")
-            }
-        })
         activityRecyclerAdapter.activityList = activityList
         layoutActivityWindowBinding.rvActivityList.adapter = activityRecyclerAdapter
         layoutActivityWindowBinding.rvActivityList.layoutManager = LinearLayoutManager(this)

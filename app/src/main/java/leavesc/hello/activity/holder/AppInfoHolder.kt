@@ -132,4 +132,13 @@ object AppInfoHolder {
         )
     }
 
+    fun getAppName(packageName: String): String? {
+        for (value in appMap.values) {
+            if (value.packageName == packageName) {
+                return value.name
+            }
+        }
+        return null
+    }
+
 }

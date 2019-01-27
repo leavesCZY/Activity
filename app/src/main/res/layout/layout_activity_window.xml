@@ -9,7 +9,7 @@
 
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:background="#ffffffff"
+            android:background="@android:color/white"
             android:layout_height="wrap_content">
 
         <TextView
@@ -23,7 +23,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:paddingBottom="4dp"
                 android:textColor="#06101b"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" android:layout_marginStart="8dp"/>
 
         <ImageView
                 android:id="@+id/iv_removeWindow"
@@ -41,18 +41,6 @@
                 app:layout_constraintRight_toLeftOf="@id/iv_removeWindow"
                 style="@style/windowIconStyle"/>
 
-        <SeekBar
-                android:id="@+id/seekBar_bg"
-                android:layout_width="0dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp"
-                android:max="100"
-                app:layout_constraintLeft_toRightOf="@id/tv_appName"
-                android:layout_height="match_parent"
-                app:layout_constraintTop_toTopOf="@id/tv_appName"
-                app:layout_constraintBottom_toBottomOf="@id/tv_appName"
-                app:layout_constraintRight_toLeftOf="@id/iv_extendsWindow"/>
-
         <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_appName"
@@ -60,9 +48,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:id="@+id/rv_activityList"
                 tools:listitem="@layout/item_app_activity"
-                app:layout_constrainedHeight="true"
                 android:scrollbars="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:background="@android:color/transparent"
                 android:layout_height="80dp"/>
 
