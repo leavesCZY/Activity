@@ -116,9 +116,7 @@ class ActivityService : AccessibilityService() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 disableSelf()
                 clean()
-                Log.e(TAG, "disableSelf()")
             } else {
-                Log.e(TAG, "view?.visibility = View.GONE")
                 clean()
             }
         }
