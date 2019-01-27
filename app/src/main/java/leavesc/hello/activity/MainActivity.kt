@@ -21,7 +21,7 @@ import leavesc.hello.activity.databinding.ActivityMainBinding
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
 import leavesc.hello.activity.service.ActivityService
-import leavesc.hello.activity.utils.AccessibilityServiceUtils
+import leavesc.hello.activity.utils.PermissionUtils
 import leavesc.hello.activity.utils.SoftKeyboardUtils
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
@@ -108,9 +108,7 @@ class MainActivity : AppCompatActivity() {
                             } else {
                                 searchView.isIconified = true
                                 SoftKeyboardUtils.hideSoftKeyboard(this@MainActivity)
-                                val fragment = AppDialogFragment()
-                                fragment.applicationInfo = find
-                                fragment.show(supportFragmentManager, "AppDialogFragment")
+                                showAppInfoDialog(find)
                             }
                         }
                     }
@@ -120,6 +118,12 @@ class MainActivity : AppCompatActivity() {
             )
         }
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun showAppInfoDialog(applicationLocal: ApplicationLocal) {
+        val fragment = AppDialogFragment()
+        fragment.applicationInfo = applicationLocal
+        fragment.show(supportFragmentManager, "AppDialogFragment")
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -138,14 +142,11 @@ class MainActivity : AppCompatActivity() {
                     appList.addAll(AppInfoHolder.getAllNonSystemApplication(this@MainActivity))
                 }
                 R.id.menu_currentActivity -> {
-                    if (AccessibilityServiceUtils.isEnabled(this@MainActivity, ActivityService::class.java)) {
-                        startService(Intent(this@MainActivity, ActivityService::class.java))
-                        Toast.makeText(this@MainActivity, "已启用", Toast.LENGTH_SHORT).show()
+                    if (PermissionUtils.canDrawOverlays(this@MainActivity)) {
+                        requestAccessibilityPermission()
                     } else {
-//                        jumpToSettingPage(this@MainActivity)
-                        showConfirmDialog()
+                        requestOverlayPermission()
                     }
-//                    showWindow()
                 }
             }
             appRecyclerAdapter.notifyDataSetChanged()
@@ -153,47 +154,66 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showConfirmDialog() {
-        val messageDialogFragment = MessageDialogFragment()
-        messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
-            DialogInterface.OnClickListener { _, _ -> jumpToSettingPage(this@MainActivity) })
-        messageDialogFragment.show(supportFragmentManager, "showConfirmDialog")
-    }
-
-    private fun showWindow() {
-        if (appCanDrawOverlays(this)) {
-            startWindowService()
+    private fun requestAccessibilityPermission() {
+        if (PermissionUtils.accessibilityServiceIsEnabled(this, ActivityService::class.java)) {
+            if (PermissionUtils.canDrawOverlays(this)) {
+                startActivityService()
+            } else {
+                showOverlayConfirmDialog()
+            }
         } else {
-            startActivityForResult(
-                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${BuildConfig.APPLICATION_ID}")),
-                REQUEST_CODE_OVERLAYS
-            )
+            showAccessibilityConfirmDialog()
         }
     }
 
-    private fun startWindowService() {
-        startService(Intent(this, ActivityService::class.java))
+    private fun requestOverlayPermission() {
+        if (PermissionUtils.canDrawOverlays(this)) {
+            if (PermissionUtils.accessibilityServiceIsEnabled(this, ActivityService::class.java)) {
+                startActivityService()
+            } else {
+                showAccessibilityConfirmDialog()
+            }
+        } else {
+            showOverlayConfirmDialog()
+        }
     }
 
-    private fun appCanDrawOverlays(context: Context) = Settings.canDrawOverlays(context)
+    private fun showAccessibilityConfirmDialog() {
+        val messageDialogFragment = MessageDialogFragment()
+        messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
+            DialogInterface.OnClickListener { _, _ -> PermissionUtils.navToAccessibilityServiceSettingPage(this@MainActivity) })
+        messageDialogFragment.show(supportFragmentManager, "showAccessibilityConfirmDialog")
+    }
+
+    private fun showOverlayConfirmDialog() {
+        val messageDialogFragment = MessageDialogFragment()
+        messageDialogFragment.init("", "检测到应用似乎还未被授予悬浮窗权限，是否前往开启权限？",
+            DialogInterface.OnClickListener { _, _ ->
+                startActivityForResult(
+                    Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+                    ),
+                    REQUEST_CODE_OVERLAYS
+                )
+            })
+        messageDialogFragment.show(supportFragmentManager, "showOverlayConfirmDialog")
+    }
+
+    private fun startActivityService() {
+        startService(Intent(this, ActivityService::class.java))
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_CODE_OVERLAYS -> {
-                if (appCanDrawOverlays(this)) {
-                    startWindowService()
+                if (PermissionUtils.canDrawOverlays(this)) {
+                    showAccessibilityConfirmDialog()
                 } else {
-                    Toast.makeText(this, "请授予弹出悬浮窗的权限", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-    }
-
-    //跳转到设置页面无障碍服务开启自定义辅助功能服务
-    fun jumpToSettingPage(context: Context) {
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
     }
 
 }

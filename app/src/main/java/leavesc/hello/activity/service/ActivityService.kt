@@ -14,6 +14,7 @@ import android.widget.SeekBar
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
+import leavesc.hello.activity.utils.PermissionUtils
 
 /**
  * 作者：leavesC
@@ -66,6 +67,18 @@ class ActivityService : AccessibilityService() {
         clean()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.e(TAG, "onStartCommand()")
+        showFloatingWindow()
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clean()
+        Log.e(TAG, "onDestroy()")
+    }
+
     private fun clean() {
         view?.let {
             windowManager.removeView(view)
@@ -74,8 +87,10 @@ class ActivityService : AccessibilityService() {
     }
 
     private fun showFloatingWindow() {
-        if (view == null) {
-            initView()
+        if (PermissionUtils.canDrawOverlays(this)) {
+            if (view == null) {
+                initView()
+            }
         }
     }
 
@@ -159,18 +174,6 @@ class ActivityService : AccessibilityService() {
             }
             return false
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        clean()
-        Log.e(TAG, "onDestroy()")
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e(TAG, "onStartCommand()")
-        showFloatingWindow()
-        return super.onStartCommand(intent, flags, startId)
     }
 
 }

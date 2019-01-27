@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AlertDialog
 
 
@@ -41,6 +42,12 @@ class MessageDialogFragment : DialogFragment() {
         builder.setPositiveButton("确定", positiveCallback)
         builder.setNegativeButton("取消", negativeCallback)
         return builder.create()
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        val ft = manager.beginTransaction()
+        ft.add(this, tag)
+        ft.commitAllowingStateLoss()
     }
 
 }

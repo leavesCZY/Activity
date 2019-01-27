@@ -12,18 +12,18 @@ import leavesc.hello.activity.R
  * Time：2019/1/22 16:18
  * Desc：
  */
-class ActivityRecyclerAdapter : RecyclerView.Adapter<ActivityRecyclerHolder>() {
+class ActivityRecyclerAdapter : RecyclerView.Adapter<ActivityRecyclerAdapter.ActivityHolder>() {
 
     lateinit var activityList: MutableList<String>
 
-    override fun onBindViewHolder(holder: ActivityRecyclerHolder, p1: Int) {
-        holder.tv_activityName.text = activityList[p1]
+    override fun onBindViewHolder(holder: ActivityHolder, p1: Int) {
+        holder.tvActivityName.text = activityList[p1]
     }
 
     override fun getItemCount() = activityList.size
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ActivityRecyclerHolder {
-        return ActivityRecyclerHolder(
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ActivityHolder {
+        return ActivityHolder(
             LayoutInflater.from(viewGroup.context).inflate(
                 R.layout.item_app_activity,
                 viewGroup,
@@ -32,10 +32,10 @@ class ActivityRecyclerAdapter : RecyclerView.Adapter<ActivityRecyclerHolder>() {
         )
     }
 
-}
+    class ActivityHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-class ActivityRecyclerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvActivityName: TextView = itemView.findViewById(R.id.tv_activityName)
 
-    val tv_activityName: TextView = itemView.findViewById(R.id.tv_activityName)
+    }
 
 }

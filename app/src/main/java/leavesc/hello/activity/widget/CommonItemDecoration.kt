@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 
-
 /**
  * 作者：leavesC
  * 时间：2019/1/16 22:39
@@ -15,16 +14,8 @@ import android.view.View
  * GitHub：https://github.com/leavesC
  * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
-class CommonItemDecoration : RecyclerView.ItemDecoration {
-
-    private var orientation = LinearLayoutManager.HORIZONTAL
-
-    private var drawable: Drawable
-
-    constructor(drawable: Drawable, orientation: Int) {
-        this.drawable = drawable
-        this.orientation = orientation
-    }
+class CommonItemDecoration(private var drawable: Drawable, private var orientation: Int) :
+    RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)

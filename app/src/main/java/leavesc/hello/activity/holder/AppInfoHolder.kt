@@ -8,7 +8,6 @@ import android.os.Build
 import leavesc.hello.activity.model.ApplicationLocal
 import java.security.MessageDigest
 
-
 /**
  * 作者：leavesC
  * 时间：2019/1/2 20:42
