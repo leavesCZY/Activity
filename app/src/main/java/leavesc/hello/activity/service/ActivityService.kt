@@ -15,6 +15,13 @@ import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
 
+/**
+ * 作者：leavesC
+ * 时间：2019/1/27 12:08
+ * 描述：
+ * GitHub：https://github.com/leavesC
+ * Blog：https://www.jianshu.com/u/9df45b87cfdf
+ */
 class ActivityService : AccessibilityService() {
 
     private val TAG = "ActivityService"
@@ -38,7 +45,8 @@ class ActivityService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        view?.let { _ ->
+        Log.e(TAG, "onAccessibilityEvent()")
+        view?.let {
             event?.let {
                 val eventType = event.eventType
                 if (eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED || eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
@@ -65,15 +73,6 @@ class ActivityService : AccessibilityService() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.e(TAG, "onDestroy()")
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_NOT_STICKY
-    }
-
     private fun showFloatingWindow() {
         if (view == null) {
             initView()
@@ -92,16 +91,14 @@ class ActivityService : AccessibilityService() {
             }
         }
         layoutActivityWindowBinding.ivRemoveWindow.setOnClickListener {
-            //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                disableSelf()
-//                clean()
-//                Log.e(TAG, "disableSelf()")
-//            } else {
-//                Log.e(TAG, "view?.visibility = View.GONE")
-//                view?.visibility = View.GONE
-//            }
-            clean()
-            stopSelf()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                disableSelf()
+                clean()
+                Log.e(TAG, "disableSelf()")
+            } else {
+                Log.e(TAG, "view?.visibility = View.GONE")
+                clean()
+            }
         }
         layoutActivityWindowBinding.seekBarBg.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -162,6 +159,18 @@ class ActivityService : AccessibilityService() {
             }
             return false
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clean()
+        Log.e(TAG, "onDestroy()")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.e(TAG, "onStartCommand()")
+        showFloatingWindow()
+        return super.onStartCommand(intent, flags, startId)
     }
 
 }

@@ -1,0 +1,46 @@
+package leavesc.hello.activity.widget
+
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import android.support.v4.app.DialogFragment
+import android.support.v7.app.AlertDialog
+
+
+/**
+ * 作者：leavesC
+ * 时间：2019/1/27 11:17
+ * 描述：
+ * GitHub：https://github.com/leavesC
+ * Blog：https://www.jianshu.com/u/9df45b87cfdf
+ */
+class MessageDialogFragment : DialogFragment() {
+
+    private var positiveCallback: DialogInterface.OnClickListener? = null
+
+    private var negativeCallback: DialogInterface.OnClickListener? = null
+
+    private var title: String? = null
+
+    private var message: String? = null
+
+    fun init(
+        title: String, message: String, positiveCallback: DialogInterface.OnClickListener,
+        negativeCallback: DialogInterface.OnClickListener? = null
+    ) {
+        this.title = title
+        this.message = message
+        this.positiveCallback = positiveCallback
+        this.negativeCallback = negativeCallback
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(context!!)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton("确定", positiveCallback)
+        builder.setNegativeButton("取消", negativeCallback)
+        return builder.create()
+    }
+
+}

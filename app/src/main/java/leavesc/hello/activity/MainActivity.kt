@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.MenuItemCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
@@ -26,6 +25,7 @@ import leavesc.hello.activity.utils.AccessibilityServiceUtils
 import leavesc.hello.activity.utils.SoftKeyboardUtils
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
+import leavesc.hello.activity.widget.MessageDialogFragment
 
 /**
  * 作者：leavesC
@@ -139,9 +139,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.menu_currentActivity -> {
                     if (AccessibilityServiceUtils.isEnabled(this@MainActivity, ActivityService::class.java)) {
+                        startService(Intent(this@MainActivity, ActivityService::class.java))
                         Toast.makeText(this@MainActivity, "已启用", Toast.LENGTH_SHORT).show()
                     } else {
-                        jumpToSettingPage(this@MainActivity)
+//                        jumpToSettingPage(this@MainActivity)
+                        showConfirmDialog()
                     }
 //                    showWindow()
                 }
@@ -149,6 +151,13 @@ class MainActivity : AppCompatActivity() {
             appRecyclerAdapter.notifyDataSetChanged()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showConfirmDialog() {
+        val messageDialogFragment = MessageDialogFragment()
+        messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
+            DialogInterface.OnClickListener { _, _ -> jumpToSettingPage(this@MainActivity) })
+        messageDialogFragment.show(supportFragmentManager, "showConfirmDialog")
     }
 
     private fun showWindow() {
