@@ -8,8 +8,8 @@ android {
         applicationId "leavesc.hello.activity"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.1"
+        versionCode 4
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

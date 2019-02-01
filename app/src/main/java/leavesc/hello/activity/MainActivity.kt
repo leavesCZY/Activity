@@ -1,5 +1,6 @@
 package leavesc.hello.activity
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -48,21 +49,31 @@ class MainActivity : AppCompatActivity() {
 
     private inner class InitAppAsyncTask : AsyncTask<Context, Void, MutableList<ApplicationLocal>>() {
 
+        private lateinit var progressDialog: ProgressDialog
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            progressDialog = ProgressDialog(this@MainActivity)
+            progressDialog.setCancelable(false)
+            progressDialog.show()
+        }
+
         override fun doInBackground(vararg params: Context): MutableList<ApplicationLocal> {
-            AppInfoHolder.init(params[0])
-            return AppInfoHolder.getAllApplication(params[0]).toMutableList()
+            AppInfoHolder.init(this@MainActivity)
+            return AppInfoHolder.getAllApplication(this@MainActivity).toMutableList()
         }
 
         override fun onPostExecute(result: MutableList<ApplicationLocal>) {
             appList = result
             initView()
+            progressDialog.dismiss()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        InitAppAsyncTask().execute(this)
+        InitAppAsyncTask().execute()
     }
 
     private fun initView() {

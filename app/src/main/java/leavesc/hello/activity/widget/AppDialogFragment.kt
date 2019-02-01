@@ -1,6 +1,5 @@
 package leavesc.hello.activity.widget
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -11,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v4.app.DialogFragment
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.Toast
 import leavesc.hello.activity.R
@@ -30,7 +30,7 @@ class AppDialogFragment : DialogFragment() {
     lateinit var applicationInfo: ApplicationLocal
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity)
+        val builder = AlertDialog.Builder(context!!)
         val bind: DialogAppShareBinding =
             DataBindingUtil.inflate(
                 LayoutInflater.from(context),
@@ -52,6 +52,8 @@ class AppDialogFragment : DialogFragment() {
         builder.setView(bind.root)
         return builder.create()
     }
+
+
 
     private fun clipboardCopy(context: Context, msg: String) {
         val clipboardManager: ClipboardManager =
