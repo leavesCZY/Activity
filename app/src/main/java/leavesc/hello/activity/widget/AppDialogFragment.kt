@@ -1,8 +1,6 @@
 package leavesc.hello.activity.widget
 
 import android.app.Dialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
@@ -16,6 +14,7 @@ import android.widget.Toast
 import leavesc.hello.activity.R
 import leavesc.hello.activity.databinding.DialogAppShareBinding
 import leavesc.hello.activity.model.ApplicationLocal
+import leavesc.hello.activity.utils.SystemUtils
 import java.io.File
 
 /**
@@ -44,21 +43,13 @@ class AppDialogFragment : DialogFragment() {
         bind.ivAppCopy.setOnClickListener {
             val context = activity
             context?.let {
-                clipboardCopy(context, applicationInfo.toString())
+                SystemUtils.clipboardCopy(context, applicationInfo.toString())
                 Toast.makeText(activity, "已复制应用信息", Toast.LENGTH_SHORT).show()
                 dismiss()
             }
         }
         builder.setView(bind.root)
         return builder.create()
-    }
-
-
-
-    private fun clipboardCopy(context: Context, msg: String) {
-        val clipboardManager: ClipboardManager =
-            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.primaryClip = ClipData.newPlainText("leavesC", msg)
     }
 
     private fun shareApp(sourceDir: String) {

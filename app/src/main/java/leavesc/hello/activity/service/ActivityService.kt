@@ -11,11 +11,14 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
+import android.widget.Toast
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
+import leavesc.hello.activity.adapter.AppRecyclerAdapter
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.utils.PermissionUtils
+import leavesc.hello.activity.utils.SystemUtils
 
 /**
  * 作者：leavesC
@@ -121,6 +124,13 @@ class ActivityService : AccessibilityService() {
             }
         }
         activityRecyclerAdapter.activityList = activityList
+        activityRecyclerAdapter.setOnItemClickListener(object : AppRecyclerAdapter.OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                val text = layoutActivityWindowBinding.tvAppName.text.toString() + "\n" + activityList[position]
+                SystemUtils.clipboardCopy(this@ActivityService, text)
+                Toast.makeText(this@ActivityService, "已复制进程&页面信息", Toast.LENGTH_SHORT).show()
+            }
+        })
         layoutActivityWindowBinding.rvActivityList.adapter = activityRecyclerAdapter
         layoutActivityWindowBinding.rvActivityList.layoutManager = LinearLayoutManager(this)
         layoutParams = WindowManager.LayoutParams()

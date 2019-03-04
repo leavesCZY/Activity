@@ -14,10 +14,19 @@ import leavesc.hello.activity.R
  */
 class ActivityRecyclerAdapter : RecyclerView.Adapter<ActivityRecyclerAdapter.ActivityHolder>() {
 
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    private var onItemClickListener: AppRecyclerAdapter.OnItemClickListener? = null
+
     lateinit var activityList: MutableList<String>
 
-    override fun onBindViewHolder(holder: ActivityHolder, p1: Int) {
-        holder.tvActivityName.text = activityList[p1]
+    override fun onBindViewHolder(holder: ActivityHolder, position: Int) {
+        holder.tvActivityName.text = activityList[position]
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.onItemClick(position)
+        }
     }
 
     override fun getItemCount() = activityList.size
@@ -36,6 +45,10 @@ class ActivityRecyclerAdapter : RecyclerView.Adapter<ActivityRecyclerAdapter.Act
 
         val tvActivityName: TextView = itemView.findViewById(R.id.tv_activityName)
 
+    }
+
+    fun setOnItemClickListener(onItemClickListener: AppRecyclerAdapter.OnItemClickListener) {
+        this.onItemClickListener = onItemClickListener
     }
 
 }
