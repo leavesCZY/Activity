@@ -2,6 +2,32 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+private static def getProperties(filePath, key) {
+    Properties properties = new Properties()
+    DataInputStream inputStream = null
+    try {
+        inputStream = new File(filePath).newDataInputStream()
+        properties.load(inputStream)
+        return properties.getProperty(key)
+    } catch (Exception e) {
+        throw e
+    } finally {
+        if (inputStream != null) {
+            inputStream.close()
+        }
+    }
+}
+
+private static def getPrivateProperties(key) {
+    return getProperties(".\\doc\\private.txt", key)
+}
+
+def keyStorePath_ = getPrivateProperties("key.keyStorePath")
+def storePassword_ = getPrivateProperties("key.storePassword")
+def keyAlias_ = getPrivateProperties("key.keyAlias")
+def keyPassword_ = getPrivateProperties("key.keyPassword")
+def storeFile_ = file(keyStorePath_)
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -12,10 +38,36 @@ android {
         versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+    signingConfigs {
         release {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+        debug {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+    buildTypes {
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            versionNameSuffix "-debug"
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            versionNameSuffix "-release"
         }
     }
     dataBinding {
