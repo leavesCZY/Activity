@@ -19,13 +19,19 @@ object PermissionUtils {
         accessibilityService: Class<out AccessibilityService>
     ): Boolean {
         val enabledServicesSetting =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-                ?: return false
+            Settings.Secure.getString(
+                context.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            ) ?: return false
         val colonSplitter = TextUtils.SimpleStringSplitter(':')
         colonSplitter.setString(enabledServicesSetting)
         while (colonSplitter.hasNext()) {
             val enabledService = ComponentName.unflattenFromString(colonSplitter.next())
-            if (enabledService != null && enabledService == ComponentName(context, accessibilityService))
+            if (enabledService != null && enabledService == ComponentName(
+                    context,
+                    accessibilityService
+                )
+            )
                 return true
         }
         return false

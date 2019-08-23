@@ -4,7 +4,7 @@
     <data>
 
     </data>
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:background="@android:color/white"
             android:padding="4dp"
@@ -41,5 +41,5 @@
                 app:layout_constraintStart_toEndOf="@id/iv_appIcon"
                 tools:text="leavesC.hello.activity"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

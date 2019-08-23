@@ -3,14 +3,14 @@ package leavesc.hello.activity.widget
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.databinding.DataBindingUtil
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import leavesc.hello.activity.R
 import leavesc.hello.activity.databinding.DialogAppShareBinding
 import leavesc.hello.activity.model.ApplicationLocal

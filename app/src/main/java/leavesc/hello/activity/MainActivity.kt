@@ -4,16 +4,16 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.MenuItemCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
         appRecyclerAdapter = AppRecyclerAdapter(appList)
-        activityMainBinding.rvAppList.layoutManager = LinearLayoutManager(this)
+        activityMainBinding.rvAppList.layoutManager =
+            LinearLayoutManager(this)
         activityMainBinding.rvAppList.adapter = appRecyclerAdapter
         activityMainBinding.rvAppList.addItemDecoration(
             CommonItemDecoration(

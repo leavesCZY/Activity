@@ -1,9 +1,9 @@
 package leavesc.hello.activity.adapter
 
-import android.databinding.DataBindingUtil
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import leavesc.hello.activity.R
 import leavesc.hello.activity.databinding.ItemAppBinding
 import leavesc.hello.activity.model.ApplicationLocal
@@ -52,6 +52,7 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
         )
     }
 
-    class AppViewHolder constructor(val itemAppBinding: ItemAppBinding) : RecyclerView.ViewHolder(itemAppBinding.root)
+    class AppViewHolder constructor(val itemAppBinding: ItemAppBinding) :
+        RecyclerView.ViewHolder(itemAppBinding.root)
 
 }

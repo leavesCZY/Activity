@@ -7,7 +7,7 @@
 
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:background="@android:color/white"
             android:layout_height="wrap_content">
@@ -41,7 +41,7 @@
                 app:layout_constraintRight_toLeftOf="@id/iv_removeWindow"
                 style="@style/windowIconStyle"/>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_appName"
                 app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +52,6 @@
                 android:background="@android:color/transparent"
                 android:layout_height="80dp"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

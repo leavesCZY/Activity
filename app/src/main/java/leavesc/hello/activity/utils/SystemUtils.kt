@@ -1,6 +1,5 @@
 package leavesc.hello.activity.utils
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 
@@ -16,7 +15,7 @@ object SystemUtils {
     fun clipboardCopy(context: Context, msg: String) {
         val clipboardManager: ClipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.primaryClip = ClipData.newPlainText("leavesC", msg)
+//        clipboardManager.primaryClip = ClipData.newPlainText("leavesC", msg)
     }
 
 }
