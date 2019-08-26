@@ -4,21 +4,21 @@ import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import androidx.databinding.DataBindingUtil
 import android.os.Build
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.adapter.AppRecyclerAdapter
+import leavesc.hello.activity.extend.canDrawOverlays
+import leavesc.hello.activity.extend.clipboardCopy
 import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
 import leavesc.hello.activity.holder.AppInfoHolder
-import leavesc.hello.activity.utils.PermissionUtils
-import leavesc.hello.activity.utils.SystemUtils
 
 /**
  * 作者：leavesC
@@ -29,7 +29,11 @@ import leavesc.hello.activity.utils.SystemUtils
  */
 class ActivityService : AccessibilityService() {
 
-    private val TAG = "ActivityService"
+    companion object {
+
+        private const val TAG = "ActivityService"
+
+    }
 
     private lateinit var windowManager: WindowManager
 
@@ -65,7 +69,9 @@ class ActivityService : AccessibilityService() {
                         }
                         activityList.add(event.className.toString())
                         activityRecyclerAdapter.notifyDataSetChanged()
-                        layoutActivityWindowBinding.rvActivityList.scrollToPosition(activityRecyclerAdapter.itemCount - 1)
+                        layoutActivityWindowBinding.rvActivityList.scrollToPosition(
+                            activityRecyclerAdapter.itemCount - 1
+                        )
                     }
                 }
             }
@@ -97,7 +103,7 @@ class ActivityService : AccessibilityService() {
     }
 
     private fun showFloatingWindow() {
-        if (PermissionUtils.canDrawOverlays(this)) {
+        if (canDrawOverlays) {
             if (view == null) {
                 initView()
             }
@@ -107,7 +113,12 @@ class ActivityService : AccessibilityService() {
     @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
         layoutActivityWindowBinding =
-                DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.layout_activity_window, null, false)
+            DataBindingUtil.inflate(
+                LayoutInflater.from(this),
+                R.layout.layout_activity_window,
+                null,
+                false
+            )
         layoutActivityWindowBinding.ivExtendsWindow.setOnClickListener {
             if (layoutActivityWindowBinding.rvActivityList.visibility == View.GONE) {
                 layoutActivityWindowBinding.rvActivityList.visibility = View.VISIBLE
@@ -124,10 +135,12 @@ class ActivityService : AccessibilityService() {
             }
         }
         activityRecyclerAdapter.activityList = activityList
-        activityRecyclerAdapter.setOnItemClickListener(object : AppRecyclerAdapter.OnItemClickListener {
+        activityRecyclerAdapter.setOnItemClickListener(object :
+            AppRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                val text = layoutActivityWindowBinding.tvAppName.text.toString() + "\n" + activityList[position]
-                SystemUtils.clipboardCopy(this@ActivityService, text)
+                val text =
+                    layoutActivityWindowBinding.tvAppName.text.toString() + "\n" + activityList[position]
+                clipboardCopy(text)
                 Toast.makeText(this@ActivityService, "已复制进程&页面信息", Toast.LENGTH_SHORT).show()
             }
         })

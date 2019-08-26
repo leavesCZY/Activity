@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="leavesc.hello.activity">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="leavesc.hello.activity">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
             android:name=".BaseApplication"
@@ -20,9 +20,9 @@
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustUnspecified|stateHidden">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <service
@@ -31,11 +31,11 @@
                 android:label="ActivityService"
                 android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService"/>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
                     android:name="android.accessibilityservice"
-                    android:resource="@xml/accessibility_config"/>
+                    android:resource="@xml/accessibility_config" />
         </service>
     </application>
 

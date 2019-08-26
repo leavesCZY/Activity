@@ -17,8 +17,6 @@ import java.security.MessageDigest
  */
 object AppInfoHolder {
 
-    private const val TAG = "AppInfoHolder"
-
     private enum class ApplicationType {
         AllApplication, NonSystemApplication, SystemApplication
     }
@@ -76,11 +74,14 @@ object AppInfoHolder {
     /**
      * 获取设备的应用信息
      */
-    private fun getApplicationInfo(context: Context, applicationType: ApplicationType): List<ApplicationLocal> {
+    private fun getApplicationInfo(
+        context: Context,
+        applicationType: ApplicationType
+    ): MutableList<ApplicationLocal> {
         if (appMap.isEmpty()) {
             init(context)
         }
-        val applicationList = ArrayList<ApplicationLocal>()
+        val applicationList = mutableListOf<ApplicationLocal>()
         when (applicationType) {
             ApplicationType.AllApplication -> {
                 applicationList.addAll(appMap.values)
@@ -105,7 +106,7 @@ object AppInfoHolder {
     /**
      * 获取设备所有的应用
      */
-    fun getAllApplication(context: Context): List<ApplicationLocal> {
+    fun getAllApplication(context: Context): MutableList<ApplicationLocal> {
         return getApplicationInfo(
             context,
             ApplicationType.AllApplication

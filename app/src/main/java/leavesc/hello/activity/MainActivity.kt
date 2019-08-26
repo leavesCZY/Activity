@@ -1,29 +1,34 @@
 package leavesc.hello.activity
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.databinding.DataBindingUtil
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.Settings
-import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import leavesc.hello.activity.adapter.AppRecyclerAdapter
 import leavesc.hello.activity.databinding.ActivityMainBinding
+import leavesc.hello.activity.extend.accessibilityServiceIsEnabled
+import leavesc.hello.activity.extend.canDrawOverlays
+import leavesc.hello.activity.extend.hideSoftKeyboard
+import leavesc.hello.activity.extend.navToAccessibilityServiceSettingPage
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
 import leavesc.hello.activity.service.ActivityService
-import leavesc.hello.activity.utils.PermissionUtils
-import leavesc.hello.activity.utils.SoftKeyboardUtils
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
 import leavesc.hello.activity.widget.MessageDialogFragment
@@ -37,8 +42,6 @@ import leavesc.hello.activity.widget.MessageDialogFragment
  */
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "MainActivity"
-
     private lateinit var appList: MutableList<ApplicationLocal>
 
     private lateinit var appRecyclerAdapter: AppRecyclerAdapter
@@ -47,33 +50,43 @@ class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_OVERLAYS = 10
 
-    private inner class InitAppAsyncTask : AsyncTask<Context, Void, MutableList<ApplicationLocal>>() {
+    private var progressDialog: ProgressDialog? = null
 
-        private lateinit var progressDialog: ProgressDialog
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            progressDialog = ProgressDialog(this@MainActivity)
-            progressDialog.setCancelable(false)
-            progressDialog.show()
+    private fun startLoading(cancelable: Boolean = false) {
+        if (progressDialog == null) {
+            progressDialog = ProgressDialog(this)
         }
+        progressDialog?.apply {
+            setCancelable(cancelable)
+            show()
+        }
+    }
 
-        override fun doInBackground(vararg params: Context): MutableList<ApplicationLocal> {
+    private fun cancelLoading() {
+        progressDialog?.dismiss()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun loadAppList() {
+        Observable.create(ObservableOnSubscribe<MutableList<ApplicationLocal>> {
             AppInfoHolder.init(this@MainActivity)
-            return AppInfoHolder.getAllApplication(this@MainActivity).toMutableList()
-        }
-
-        override fun onPostExecute(result: MutableList<ApplicationLocal>) {
-            appList = result
+            val toMutableList = AppInfoHolder.getAllApplication(this@MainActivity)
+            it.onNext(toMutableList)
+            it.onComplete()
+        }).subscribeOn(Schedulers.io()).doOnSubscribe {
+            startLoading()
+        }.doFinally {
+            cancelLoading()
+        }.observeOn(AndroidSchedulers.mainThread()).subscribe {
+            appList = it
             initView()
-            progressDialog.dismiss()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        InitAppAsyncTask().execute()
+        loadAppList()
     }
 
     private fun initView() {
@@ -89,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         )
         appRecyclerAdapter.setOnItemClickListener(object : AppRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                SoftKeyboardUtils.hideSoftKeyboard(this@MainActivity)
+                hideSoftKeyboard()
                 val fragment = AppDialogFragment()
                 fragment.applicationInfo = appList[position]
                 fragment.show(supportFragmentManager, "AppDialogFragment")
@@ -116,10 +129,11 @@ class MainActivity : AppCompatActivity() {
                                 it.name.toLowerCase().contains(value.toLowerCase())
                             }
                             if (find == null) {
-                                Toast.makeText(this@MainActivity, "没有找到应用", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, "没有找到应用", Toast.LENGTH_SHORT)
+                                    .show()
                             } else {
                                 searchView.isIconified = true
-                                SoftKeyboardUtils.hideSoftKeyboard(this@MainActivity)
+                                hideSoftKeyboard()
                                 showAppInfoDialog(find)
                             }
                         }
@@ -138,8 +152,8 @@ class MainActivity : AppCompatActivity() {
         fragment.show(supportFragmentManager, "AppDialogFragment")
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.apply {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        item.apply {
             when (item.itemId) {
                 R.id.menu_allApp -> {
                     appList.clear()
@@ -154,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                     appList.addAll(AppInfoHolder.getAllNonSystemApplication(this@MainActivity))
                 }
                 R.id.menu_currentActivity -> {
-                    if (PermissionUtils.canDrawOverlays(this@MainActivity)) {
+                    if (canDrawOverlays) {
                         requestAccessibilityPermission()
                     } else {
                         requestOverlayPermission()
@@ -167,8 +181,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestAccessibilityPermission() {
-        if (PermissionUtils.accessibilityServiceIsEnabled(this, ActivityService::class.java)) {
-            if (PermissionUtils.canDrawOverlays(this)) {
+        if (accessibilityServiceIsEnabled(ActivityService::class.java)) {
+            if (canDrawOverlays) {
                 startActivityService()
             } else {
                 showOverlayConfirmDialog()
@@ -179,8 +193,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestOverlayPermission() {
-        if (PermissionUtils.canDrawOverlays(this)) {
-            if (PermissionUtils.accessibilityServiceIsEnabled(this, ActivityService::class.java)) {
+        if (canDrawOverlays) {
+            if (accessibilityServiceIsEnabled(ActivityService::class.java)) {
                 startActivityService()
             } else {
                 showAccessibilityConfirmDialog()
@@ -193,7 +207,9 @@ class MainActivity : AppCompatActivity() {
     private fun showAccessibilityConfirmDialog() {
         val messageDialogFragment = MessageDialogFragment()
         messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
-            DialogInterface.OnClickListener { _, _ -> PermissionUtils.navToAccessibilityServiceSettingPage(this@MainActivity) })
+            DialogInterface.OnClickListener { _, _ ->
+                navToAccessibilityServiceSettingPage()
+            })
         messageDialogFragment.show(supportFragmentManager, "showAccessibilityConfirmDialog")
     }
 
@@ -219,7 +235,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_CODE_OVERLAYS -> {
-                if (PermissionUtils.canDrawOverlays(this)) {
+                if (canDrawOverlays) {
                     showAccessibilityConfirmDialog()
                 } else {
                     Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_SHORT).show()

@@ -13,8 +13,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import leavesc.hello.activity.R
 import leavesc.hello.activity.databinding.DialogAppShareBinding
+import leavesc.hello.activity.extend.clipboardCopy
 import leavesc.hello.activity.model.ApplicationLocal
-import leavesc.hello.activity.utils.SystemUtils
 import java.io.File
 
 /**
@@ -37,15 +37,15 @@ class AppDialogFragment : DialogFragment() {
             )
         bind.applicationLocal = applicationInfo
         bind.ivAppSettings.setOnClickListener {
-            openAppSettings(context!!, applicationInfo.packageName)
-            dismiss()
+            context?.let {
+                openAppSettings(it, applicationInfo.packageName)
+            }
         }
         bind.ivAppCopy.setOnClickListener {
             val context = activity
             context?.let {
-                SystemUtils.clipboardCopy(context, applicationInfo.toString())
-                Toast.makeText(activity, "已复制应用信息", Toast.LENGTH_SHORT).show()
-                dismiss()
+                it.clipboardCopy(applicationInfo.toString())
+                Toast.makeText(it, "已复制应用信息", Toast.LENGTH_SHORT).show()
             }
         }
         builder.setView(bind.root)

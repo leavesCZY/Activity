@@ -3,9 +3,9 @@ package leavesc.hello.activity.widget
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 
 /**
  * 作者：leavesC
@@ -17,7 +17,12 @@ import android.view.View
 class CommonItemDecoration(private var drawable: Drawable, private var orientation: Int) :
     RecyclerView.ItemDecoration() {
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
         super.getItemOffsets(outRect, view, parent, state)
         if (orientation == LinearLayoutManager.HORIZONTAL) {
             outRect.set(0, 0, drawable.intrinsicWidth, 0)
