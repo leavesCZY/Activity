@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingTop="4dp"
         android:id="@+id/tv_activityName"
-        android:paddingBottom="4dp"
-        android:textSize="12sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="#006569"
-        tools:text="hello.leavesc.floatingwindow.MainActivity"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:textColor="@android:color/white"
-        android:layout_height="wrap_content"/>
+        android:textSize="12sp"
+        tools:text="hello.leavesc.floatingwindow.MainActivity" />
 
