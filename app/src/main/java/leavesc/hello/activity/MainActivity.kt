@@ -1,7 +1,6 @@
 package leavesc.hello.activity
 
 import android.annotation.SuppressLint
-import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -31,7 +30,9 @@ import leavesc.hello.activity.model.ApplicationLocal
 import leavesc.hello.activity.service.ActivityService
 import leavesc.hello.activity.widget.AppDialogFragment
 import leavesc.hello.activity.widget.CommonItemDecoration
+import leavesc.hello.activity.widget.LoadingDialog
 import leavesc.hello.activity.widget.MessageDialogFragment
+import java.util.*
 
 /**
  * 作者：leavesC
@@ -42,28 +43,24 @@ import leavesc.hello.activity.widget.MessageDialogFragment
  */
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+
+        private const val REQUEST_CODE_OVERLAYS = 10
+
+    }
+
     private lateinit var appList: MutableList<ApplicationLocal>
 
     private lateinit var appRecyclerAdapter: AppRecyclerAdapter
 
     private lateinit var activityMainBinding: ActivityMainBinding
 
-    private val REQUEST_CODE_OVERLAYS = 10
+    private var progressDialog: LoadingDialog? = null
 
-    private var progressDialog: ProgressDialog? = null
-
-    private fun startLoading(cancelable: Boolean = false) {
-        if (progressDialog == null) {
-            progressDialog = ProgressDialog(this)
-        }
-        progressDialog?.apply {
-            setCancelable(cancelable)
-            show()
-        }
-    }
-
-    private fun cancelLoading() {
-        progressDialog?.dismiss()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        loadAppList()
     }
 
     @SuppressLint("CheckResult")
@@ -76,23 +73,18 @@ class MainActivity : AppCompatActivity() {
         }).subscribeOn(Schedulers.io()).doOnSubscribe {
             startLoading()
         }.doFinally {
-            cancelLoading()
+            runOnUiThread {
+                cancelLoading()
+            }
         }.observeOn(AndroidSchedulers.mainThread()).subscribe {
             appList = it
             initView()
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        loadAppList()
-    }
-
     private fun initView() {
         appRecyclerAdapter = AppRecyclerAdapter(appList)
-        activityMainBinding.rvAppList.layoutManager =
-            LinearLayoutManager(this)
+        activityMainBinding.rvAppList.layoutManager = LinearLayoutManager(this)
         activityMainBinding.rvAppList.adapter = appRecyclerAdapter
         activityMainBinding.rvAppList.addItemDecoration(
             CommonItemDecoration(
@@ -126,7 +118,8 @@ class MainActivity : AppCompatActivity() {
                     value?.let {
                         if (it.isNotEmpty()) {
                             val find = AppInfoHolder.getAllApplication(this@MainActivity).find {
-                                it.name.toLowerCase().contains(value.toLowerCase())
+                                it.name.toLowerCase(Locale.CHINA)
+                                    .contains(value.toLowerCase(Locale.CHINA))
                             }
                             if (find == null) {
                                 Toast.makeText(this@MainActivity, "没有找到应用", Toast.LENGTH_SHORT)
@@ -233,6 +226,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_CODE_OVERLAYS -> {
                 if (canDrawOverlays) {
@@ -242,6 +236,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun startLoading(cancelable: Boolean = false) {
+        if (progressDialog == null) {
+            progressDialog = LoadingDialog(this)
+        }
+        progressDialog?.start(cancelable, cancelable)
+    }
+
+    private fun cancelLoading() {
+        progressDialog?.dismiss()
     }
 
 }
