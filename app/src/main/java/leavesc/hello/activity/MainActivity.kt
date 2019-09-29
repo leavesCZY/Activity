@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -21,10 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import leavesc.hello.activity.adapter.AppRecyclerAdapter
 import leavesc.hello.activity.databinding.ActivityMainBinding
-import leavesc.hello.activity.extend.accessibilityServiceIsEnabled
-import leavesc.hello.activity.extend.canDrawOverlays
-import leavesc.hello.activity.extend.hideSoftKeyboard
-import leavesc.hello.activity.extend.navToAccessibilityServiceSettingPage
+import leavesc.hello.activity.extend.*
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
 import leavesc.hello.activity.service.ActivityService
@@ -97,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                 hideSoftKeyboard()
                 val fragment = AppDialogFragment()
                 fragment.applicationInfo = appList[position]
-                fragment.show(supportFragmentManager, "AppDialogFragment")
+                showDialog(fragment)
             }
         })
     }
@@ -122,8 +118,7 @@ class MainActivity : AppCompatActivity() {
                                     .contains(value.toLowerCase(Locale.CHINA))
                             }
                             if (find == null) {
-                                Toast.makeText(this@MainActivity, "没有找到应用", Toast.LENGTH_SHORT)
-                                    .show()
+                                showToast("没有找到应用")
                             } else {
                                 searchView.isIconified = true
                                 hideSoftKeyboard()
@@ -142,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAppInfoDialog(applicationLocal: ApplicationLocal) {
         val fragment = AppDialogFragment()
         fragment.applicationInfo = applicationLocal
-        fragment.show(supportFragmentManager, "AppDialogFragment")
+        showDialog(fragment)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -203,7 +198,7 @@ class MainActivity : AppCompatActivity() {
             DialogInterface.OnClickListener { _, _ ->
                 navToAccessibilityServiceSettingPage()
             })
-        messageDialogFragment.show(supportFragmentManager, "showAccessibilityConfirmDialog")
+        showDialog(messageDialogFragment)
     }
 
     private fun showOverlayConfirmDialog() {
@@ -218,7 +213,7 @@ class MainActivity : AppCompatActivity() {
                     REQUEST_CODE_OVERLAYS
                 )
             })
-        messageDialogFragment.show(supportFragmentManager, "showOverlayConfirmDialog")
+        showDialog(messageDialogFragment)
     }
 
     private fun startActivityService() {
@@ -232,7 +227,7 @@ class MainActivity : AppCompatActivity() {
                 if (canDrawOverlays) {
                     showAccessibilityConfirmDialog()
                 } else {
-                    Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_SHORT).show()
+                    showToast("请授予悬浮窗权限")
                 }
             }
         }

@@ -6,6 +6,9 @@ import android.content.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 
 /**
  * 作者：leavesC
@@ -36,6 +39,17 @@ fun Context.navToAccessibilityServiceSettingPage() {
 val Context.canDrawOverlays
     get() = Settings.canDrawOverlays(this)
 
+fun Context.clipboardCopy(msg: String) {
+    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboardManager.setPrimaryClip(ClipData.newPlainText("Activity", msg))
+}
+
+fun Context.showToast(msg: String) {
+    if (msg.isNotBlank()) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+}
+
 fun Activity.hideSoftKeyboard() {
     val view = currentFocus
     if (view != null) {
@@ -48,7 +62,6 @@ fun Activity.hideSoftKeyboard() {
     }
 }
 
-fun Context.clipboardCopy(msg: String) {
-    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboardManager.setPrimaryClip(ClipData.newPlainText("Activity", msg))
+fun FragmentActivity.showDialog(dialogFragment: DialogFragment) {
+    dialogFragment.show(supportFragmentManager, dialogFragment.javaClass.name)
 }

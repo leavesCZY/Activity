@@ -7,13 +7,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import leavesc.hello.activity.R
 import leavesc.hello.activity.databinding.DialogAppShareBinding
 import leavesc.hello.activity.extend.clipboardCopy
+import leavesc.hello.activity.extend.showToast
 import leavesc.hello.activity.model.ApplicationLocal
 import java.io.File
 
@@ -45,7 +45,7 @@ class AppDialogFragment : DialogFragment() {
             val context = activity
             context?.let {
                 it.clipboardCopy(applicationInfo.toString())
-                Toast.makeText(it, "已复制应用信息", Toast.LENGTH_SHORT).show()
+                it.showToast("已复制应用信息")
             }
         }
         builder.setView(bind.root)

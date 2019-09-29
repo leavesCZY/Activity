@@ -10,12 +10,8 @@ import leavesc.hello.activity.BaseApplication
  * GitHub：https://github.com/leavesC
  * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
-class ContextHolder {
+object ContextHolder {
 
-    companion object {
-
-        val context: Context by lazy { BaseApplication.appContext }
-
-    }
+    val context: Context by lazy { BaseApplication.appContext }
 
 }

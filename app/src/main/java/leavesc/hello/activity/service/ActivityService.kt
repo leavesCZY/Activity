@@ -9,15 +9,15 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import leavesc.hello.activity.R
 import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
 import leavesc.hello.activity.adapter.AppRecyclerAdapter
+import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
 import leavesc.hello.activity.extend.canDrawOverlays
 import leavesc.hello.activity.extend.clipboardCopy
-import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
+import leavesc.hello.activity.extend.showToast
 import leavesc.hello.activity.holder.AppInfoHolder
 
 /**
@@ -141,7 +141,7 @@ class ActivityService : AccessibilityService() {
                 val text =
                     layoutActivityWindowBinding.tvAppName.text.toString() + "\n" + activityList[position]
                 clipboardCopy(text)
-                Toast.makeText(this@ActivityService, "已复制进程&页面信息", Toast.LENGTH_SHORT).show()
+                showToast("已复制进程&页面信息")
             }
         })
         layoutActivityWindowBinding.rvActivityList.adapter = activityRecyclerAdapter
