@@ -10,7 +10,7 @@
 
 另外一个原因是在很久前在注册某个平台的账号时，需要获取 apk 的 md5 值，当时是通过命令行来获取的，觉得很不方便，就一直有写个 App 来获取签名值的想法，现在也算作达成所愿了
 
-## App 下载地址：[Activity](https://www.pgyer.com/ActivityLeaves)
+## App 下载地址：[Activity](doc/app-debug.apk)
 
 ![](screenshot/1.png)
 
