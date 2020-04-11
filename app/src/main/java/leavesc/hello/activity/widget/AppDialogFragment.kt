@@ -1,17 +1,16 @@
 package leavesc.hello.activity.widget
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDialogFragment
+import kotlinx.android.synthetic.main.dialog_app_share.*
 import leavesc.hello.activity.R
-import leavesc.hello.activity.databinding.DialogAppShareBinding
 import leavesc.hello.activity.extend.clipboardCopy
 import leavesc.hello.activity.extend.showToast
 import leavesc.hello.activity.model.ApplicationLocal
@@ -24,32 +23,45 @@ import java.io.File
  * GitHub：https://github.com/leavesC
  * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
-class AppDialogFragment : DialogFragment() {
+class AppDialogFragment : AppCompatDialogFragment() {
 
     lateinit var applicationInfo: ApplicationLocal
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(context!!)
-        val bind: DialogAppShareBinding =
-            DataBindingUtil.inflate(
-                LayoutInflater.from(context),
-                R.layout.dialog_app_share, null, false
-            )
-        bind.applicationLocal = applicationInfo
-        bind.ivAppSettings.setOnClickListener {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.dialog_app_share, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        isCancelable = true
+        iv_icon.setImageDrawable(applicationInfo.icon)
+        tv_appName.text = applicationInfo.name
+        tv_appPackage.text = applicationInfo.packageName
+        tv_appVersionName.text = applicationInfo.versionNameFormat
+        tv_appTargetSdkVersion.text = applicationInfo.targetSdkVersionFormat
+        tv_minSdkVersion.text = applicationInfo.minSdkVersionFormat
+        tv_appLongVersionCode.text = applicationInfo.longVersionCodeFormat
+        tv_sigMd5.text = applicationInfo.sigMd5Format
+        tv_appSize.text = applicationInfo.apkSizeFormat
+        tv_appFirstInstallTime.text = applicationInfo.firstInstallTimeFormat
+        tv_appLastUpdateTime.text = applicationInfo.lastInstallTimeFormat
+        tv_sourceDir.text = applicationInfo.sourceDirFormat
+        iv_appSettings.setOnClickListener {
             context?.let {
                 openAppSettings(it, applicationInfo.packageName)
             }
         }
-        bind.ivAppCopy.setOnClickListener {
+        iv_appCopy.setOnClickListener {
             val context = activity
             context?.let {
                 it.clipboardCopy(applicationInfo.toString())
                 it.showToast("已复制应用信息")
             }
         }
-        builder.setView(bind.root)
-        return builder.create()
     }
 
     private fun shareApp(sourceDir: String) {

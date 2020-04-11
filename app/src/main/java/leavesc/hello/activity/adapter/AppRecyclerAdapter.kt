@@ -1,11 +1,12 @@
 package leavesc.hello.activity.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import leavesc.hello.activity.R
-import leavesc.hello.activity.databinding.ItemAppBinding
 import leavesc.hello.activity.model.ApplicationLocal
 
 /**
@@ -33,9 +34,9 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
     }
 
     override fun onBindViewHolder(viewHolder: AppViewHolder, position: Int) {
-        viewHolder.itemAppBinding.ivAppIcon.setImageDrawable(appList[position].icon)
-        viewHolder.itemAppBinding.tvAppName.text = appList[position].name
-        viewHolder.itemAppBinding.tvAppPackageName.text = appList[position].packageName
+        viewHolder.iv_appIcon.setImageDrawable(appList[position].icon)
+        viewHolder.tv_appName.text = appList[position].name
+        viewHolder.tv_appPackageName.text = appList[position].packageName
         viewHolder.itemView.setOnClickListener {
             onItemClickListener?.onItemClick(position)
         }
@@ -43,16 +44,16 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AppViewHolder {
         return AppViewHolder(
-            DataBindingUtil.inflate(
-                LayoutInflater.from(viewGroup.context),
-                R.layout.item_app,
-                viewGroup,
-                false
-            )
+            LayoutInflater.from(viewGroup.context).inflate(R.layout.item_app, viewGroup, false)
         )
     }
 
-    class AppViewHolder constructor(val itemAppBinding: ItemAppBinding) :
-        RecyclerView.ViewHolder(itemAppBinding.root)
+    class AppViewHolder constructor(val view: View) : RecyclerView.ViewHolder(view) {
+
+        val iv_appIcon = view.findViewById<ImageView>(R.id.iv_appIcon)
+        val tv_appName = view.findViewById<TextView>(R.id.tv_appName)
+        val tv_appPackageName = view.findViewById<TextView>(R.id.tv_appPackageName)
+
+    }
 
 }

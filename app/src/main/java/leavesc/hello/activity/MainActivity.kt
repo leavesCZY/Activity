@@ -12,14 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.*
 import leavesc.hello.activity.adapter.AppRecyclerAdapter
-import leavesc.hello.activity.databinding.ActivityMainBinding
 import leavesc.hello.activity.extend.*
 import leavesc.hello.activity.holder.AppInfoHolder
 import leavesc.hello.activity.model.ApplicationLocal
@@ -49,13 +48,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appRecyclerAdapter: AppRecyclerAdapter
 
-    private lateinit var activityMainBinding: ActivityMainBinding
-
     private var progressDialog: LoadingDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setContentView(R.layout.activity_main)
         loadAppList()
     }
 
@@ -80,9 +77,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
         appRecyclerAdapter = AppRecyclerAdapter(appList)
-        activityMainBinding.rvAppList.layoutManager = LinearLayoutManager(this)
-        activityMainBinding.rvAppList.adapter = appRecyclerAdapter
-        activityMainBinding.rvAppList.addItemDecoration(
+        rv_appList.layoutManager = LinearLayoutManager(this)
+        rv_appList.adapter = appRecyclerAdapter
+        rv_appList.addItemDecoration(
             CommonItemDecoration(
                 ContextCompat.getDrawable(this@MainActivity, R.drawable.layout_divider)!!,
                 LinearLayoutManager.VERTICAL

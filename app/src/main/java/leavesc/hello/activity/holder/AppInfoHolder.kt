@@ -31,7 +31,7 @@ object AppInfoHolder {
             val applicationInfo = packageInfo.applicationInfo
             val application = ApplicationLocal(
                 packageName = packageInfo.packageName,
-                versionName = packageInfo.versionName,
+                versionName = packageInfo.versionName ?: "",
                 targetSdkVersion = applicationInfo.targetSdkVersion,
                 minSdkVersion = if (Build.VERSION.SDK_INT > 23) applicationInfo.minSdkVersion else 0,
                 longVersionCode = packageInfo.versionCode.toLong(),
