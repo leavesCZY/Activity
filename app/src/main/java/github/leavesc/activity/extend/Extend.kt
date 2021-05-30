@@ -1,4 +1,4 @@
-package leavesc.hello.activity.extend
+package github.leavesc.activity.extend
 
 import android.accessibilityservice.AccessibilityService
 import android.app.Activity

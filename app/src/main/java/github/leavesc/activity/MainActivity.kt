@@ -1,4 +1,4 @@
-package leavesc.hello.activity
+package github.leavesc.activity
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -13,20 +13,20 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import github.leavesc.activity.adapter.AppRecyclerAdapter
+import github.leavesc.activity.extend.*
+import github.leavesc.activity.holder.AppInfoHolder
+import github.leavesc.activity.model.ApplicationLocal
+import github.leavesc.activity.service.ActivityService
+import github.leavesc.activity.widget.AppDialogFragment
+import github.leavesc.activity.widget.CommonItemDecoration
+import github.leavesc.activity.widget.LoadingDialog
+import github.leavesc.activity.widget.MessageDialogFragment
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import leavesc.hello.activity.adapter.AppRecyclerAdapter
-import leavesc.hello.activity.extend.*
-import leavesc.hello.activity.holder.AppInfoHolder
-import leavesc.hello.activity.model.ApplicationLocal
-import leavesc.hello.activity.service.ActivityService
-import leavesc.hello.activity.widget.AppDialogFragment
-import leavesc.hello.activity.widget.CommonItemDecoration
-import leavesc.hello.activity.widget.LoadingDialog
-import leavesc.hello.activity.widget.MessageDialogFragment
 import java.util.*
 
 /**
@@ -34,7 +34,6 @@ import java.util.*
  * 时间：2019/1/20 20:41
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class MainActivity : AppCompatActivity() {
 

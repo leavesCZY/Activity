@@ -1,9 +1,9 @@
-package leavesc.hello.activity.model
+package github.leavesc.activity.model
 
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.text.format.Formatter
-import leavesc.hello.activity.holder.ContextHolder
+import github.leavesc.activity.holder.ContextHolder
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -13,7 +13,6 @@ import java.util.*
  * 时间：2019/1/2 20:45
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 data class ApplicationLocal(
     val name: String,

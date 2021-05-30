@@ -1,4 +1,4 @@
-package leavesc.hello.activity.widget
+package github.leavesc.activity.widget
 
 import android.app.Dialog
 import android.content.Context
@@ -6,7 +6,7 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageView
-import leavesc.hello.activity.R
+import github.leavesc.activity.R
 
 /**
  * 作者：leavesC

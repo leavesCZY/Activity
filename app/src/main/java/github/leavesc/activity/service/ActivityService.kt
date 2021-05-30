@@ -1,4 +1,4 @@
-package leavesc.hello.activity.service
+package github.leavesc.activity.service
 
 import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
@@ -11,21 +11,20 @@ import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import leavesc.hello.activity.R
-import leavesc.hello.activity.adapter.ActivityRecyclerAdapter
-import leavesc.hello.activity.adapter.AppRecyclerAdapter
-import leavesc.hello.activity.databinding.LayoutActivityWindowBinding
-import leavesc.hello.activity.extend.canDrawOverlays
-import leavesc.hello.activity.extend.clipboardCopy
-import leavesc.hello.activity.extend.showToast
-import leavesc.hello.activity.holder.AppInfoHolder
+import github.leavesc.activity.R
+import github.leavesc.activity.adapter.ActivityRecyclerAdapter
+import github.leavesc.activity.adapter.AppRecyclerAdapter
+import github.leavesc.activity.databinding.LayoutActivityWindowBinding
+import github.leavesc.activity.extend.canDrawOverlays
+import github.leavesc.activity.extend.clipboardCopy
+import github.leavesc.activity.extend.showToast
+import github.leavesc.activity.holder.AppInfoHolder
 
 /**
  * 作者：leavesC
  * 时间：2019/1/27 12:08
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class ActivityService : AccessibilityService() {
 

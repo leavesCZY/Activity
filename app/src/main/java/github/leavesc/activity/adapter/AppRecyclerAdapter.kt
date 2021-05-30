@@ -1,4 +1,4 @@
-package leavesc.hello.activity.adapter
+package github.leavesc.activity.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,15 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import leavesc.hello.activity.R
-import leavesc.hello.activity.model.ApplicationLocal
+import github.leavesc.activity.R
+import github.leavesc.activity.model.ApplicationLocal
 
 /**
  * 作者：leavesC
  * 时间：2019/1/16 21:08
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
     RecyclerView.Adapter<AppRecyclerAdapter.AppViewHolder>() {
@@ -24,10 +23,6 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
     }
 
     private var onItemClickListener: OnItemClickListener? = null
-
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
-        this.onItemClickListener = onItemClickListener
-    }
 
     override fun getItemCount(): Int {
         return if (appList.isNullOrEmpty()) 0 else appList.size
@@ -54,6 +49,10 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
         val tv_appName = view.findViewById<TextView>(R.id.tv_appName)
         val tv_appPackageName = view.findViewById<TextView>(R.id.tv_appPackageName)
 
+    }
+
+    fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
+        this.onItemClickListener = onItemClickListener
     }
 
 }

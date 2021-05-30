@@ -1,4 +1,4 @@
-package leavesc.hello.activity.widget
+package github.leavesc.activity.widget
 
 import android.content.Context
 import android.content.Intent
@@ -9,11 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
+import github.leavesc.activity.R
+import github.leavesc.activity.extend.clipboardCopy
+import github.leavesc.activity.extend.showToast
+import github.leavesc.activity.model.ApplicationLocal
 import kotlinx.android.synthetic.main.dialog_app_share.*
-import leavesc.hello.activity.R
-import leavesc.hello.activity.extend.clipboardCopy
-import leavesc.hello.activity.extend.showToast
-import leavesc.hello.activity.model.ApplicationLocal
 import java.io.File
 
 /**
@@ -21,7 +21,6 @@ import java.io.File
  * 时间：2019/1/18 0:07
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class AppDialogFragment : AppCompatDialogFragment() {
 

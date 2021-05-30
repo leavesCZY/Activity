@@ -1,11 +1,11 @@
-package leavesc.hello.activity.adapter
+package github.leavesc.activity.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import leavesc.hello.activity.R
+import github.leavesc.activity.R
 
 /**
  * Created by：CZY

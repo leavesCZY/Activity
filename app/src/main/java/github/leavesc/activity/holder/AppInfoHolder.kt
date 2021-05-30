@@ -1,11 +1,11 @@
-package leavesc.hello.activity.holder
+package github.leavesc.activity.holder
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import leavesc.hello.activity.model.ApplicationLocal
+import github.leavesc.activity.model.ApplicationLocal
 import java.security.MessageDigest
 
 /**
@@ -13,7 +13,6 @@ import java.security.MessageDigest
  * 时间：2019/1/2 20:42
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 object AppInfoHolder {
 

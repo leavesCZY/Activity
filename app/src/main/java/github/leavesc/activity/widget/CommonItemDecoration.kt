@@ -1,4 +1,4 @@
-package leavesc.hello.activity.widget
+package github.leavesc.activity.widget
 
 import android.graphics.Canvas
 import android.graphics.Rect
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
  * 时间：2019/1/16 22:39
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class CommonItemDecoration(private var drawable: Drawable, private var orientation: Int) :
     RecyclerView.ItemDecoration() {

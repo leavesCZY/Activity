@@ -1,4 +1,4 @@
-package leavesc.hello.activity
+package github.leavesc.activity
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

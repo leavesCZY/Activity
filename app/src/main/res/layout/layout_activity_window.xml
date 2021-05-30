@@ -23,7 +23,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:paddingBottom="4dp"
                 android:textColor="#06101b"
-                android:layout_height="wrap_content" android:layout_marginStart="8dp"/>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp" />
 
         <ImageView
                 android:id="@+id/iv_removeWindow"
@@ -31,7 +32,7 @@
                 app:layout_constraintTop_toTopOf="@id/tv_appName"
                 app:layout_constraintBottom_toBottomOf="@id/tv_appName"
                 app:layout_constraintRight_toRightOf="parent"
-                style="@style/windowIconStyle"/>
+                style="@style/windowIconStyle" />
 
         <ImageView
                 android:id="@+id/iv_extendsWindow"
@@ -39,7 +40,7 @@
                 app:layout_constraintTop_toTopOf="@id/tv_appName"
                 app:layout_constraintBottom_toBottomOf="@id/tv_appName"
                 app:layout_constraintRight_toLeftOf="@id/iv_removeWindow"
-                style="@style/windowIconStyle"/>
+                style="@style/windowIconStyle" />
 
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
@@ -50,7 +51,7 @@
                 tools:listitem="@layout/item_app_activity"
                 android:scrollbars="vertical"
                 android:background="@android:color/transparent"
-                android:layout_height="80dp"/>
+                android:layout_height="80dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

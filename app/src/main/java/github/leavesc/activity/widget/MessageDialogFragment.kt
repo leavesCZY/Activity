@@ -1,4 +1,4 @@
-package leavesc.hello.activity.widget
+package github.leavesc.activity.widget
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentManager
  * 时间：2019/1/27 11:17
  * 描述：
  * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
  */
 class MessageDialogFragment : DialogFragment() {
 
