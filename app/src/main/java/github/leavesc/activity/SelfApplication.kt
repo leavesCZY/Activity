@@ -8,7 +8,7 @@ import android.app.Application
  * 描述：
  * GitHub：https://github.com/leavesC
  */
-class BaseApplication : Application() {
+class SelfApplication : Application() {
 
     companion object {
         lateinit var appContext: Application

@@ -1,7 +1,7 @@
 package github.leavesc.activity.holder
 
 import android.content.Context
-import github.leavesc.activity.BaseApplication
+import github.leavesc.activity.SelfApplication
 
 /**
  * 作者：leavesC
@@ -11,6 +11,6 @@ import github.leavesc.activity.BaseApplication
  */
 object ContextHolder {
 
-    val context: Context by lazy { BaseApplication.appContext }
+    val context: Context by lazy { SelfApplication.appContext }
 
 }

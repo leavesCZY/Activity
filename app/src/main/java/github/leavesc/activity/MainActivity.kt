@@ -1,10 +1,11 @@
 package github.leavesc.activity
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
@@ -22,10 +23,6 @@ import github.leavesc.activity.widget.AppDialogFragment
 import github.leavesc.activity.widget.CommonItemDecoration
 import github.leavesc.activity.widget.LoadingDialog
 import github.leavesc.activity.widget.MessageDialogFragment
-import io.reactivex.Observable
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -49,29 +46,34 @@ class MainActivity : AppCompatActivity() {
 
     private var progressDialog: LoadingDialog? = null
 
+    private val loadAppThread = HandlerThread("loadApp")
+
+    private val loadAppHandler by lazy {
+        Handler(loadAppThread.looper, Handler.Callback {
+            if (this.isDestroyed || this.isFinishing) {
+                return@Callback true
+            }
+            runOnUiThread {
+                startLoading()
+            }
+            AppInfoHolder.init(this@MainActivity)
+            appList = AppInfoHolder.getAllApplication(this@MainActivity)
+            if (this.isDestroyed || this.isFinishing) {
+                return@Callback true
+            }
+            runOnUiThread {
+                initView()
+                cancelLoading()
+            }
+            return@Callback true
+        })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        loadAppList()
-    }
-
-    @SuppressLint("CheckResult")
-    private fun loadAppList() {
-        Observable.create(ObservableOnSubscribe<MutableList<ApplicationLocal>> {
-            AppInfoHolder.init(this@MainActivity)
-            val toMutableList = AppInfoHolder.getAllApplication(this@MainActivity)
-            it.onNext(toMutableList)
-            it.onComplete()
-        }).subscribeOn(Schedulers.io()).doOnSubscribe {
-            startLoading()
-        }.doFinally {
-            runOnUiThread {
-                cancelLoading()
-            }
-        }.observeOn(AndroidSchedulers.mainThread()).subscribe {
-            appList = it
-            initView()
-        }
+        loadAppThread.start()
+        loadAppHandler.sendEmptyMessage(1)
     }
 
     private fun initView() {
@@ -238,6 +240,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun cancelLoading() {
         progressDialog?.dismiss()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadAppThread.quitSafely()
+        loadAppHandler.removeCallbacksAndMessages(null)
     }
 
 }
