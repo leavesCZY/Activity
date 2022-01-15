@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 
 /**
  * @Author: leavesCZY
@@ -42,12 +41,6 @@ class MessageDialogFragment : DialogFragment() {
         builder.setPositiveButton("确定", positiveCallback)
         builder.setNegativeButton("取消", negativeCallback)
         return builder.create()
-    }
-
-    override fun show(manager: FragmentManager, tag: String?) {
-        val ft = manager.beginTransaction()
-        ft.add(this, tag)
-        ft.commitAllowingStateLoss()
     }
 
 }

@@ -1,6 +1,5 @@
 package github.leavesczy.activity
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -110,11 +109,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onQueryTextSubmit(value: String?): Boolean {
-                    value?.let {
-                        if (it.isNotEmpty()) {
+                    value?.let { s ->
+                        if (s.isNotEmpty()) {
                             val find = AppInfoHolder.getAllApplication(this@MainActivity).find {
-                                it.name.toLowerCase(Locale.CHINA)
-                                    .contains(value.toLowerCase(Locale.CHINA))
+                                it.name.lowercase(Locale.CHINA)
+                                    .contains(value.lowercase(Locale.CHINA))
                             }
                             if (find == null) {
                                 showToast("没有找到应用")
@@ -194,7 +193,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAccessibilityConfirmDialog() {
         val messageDialogFragment = MessageDialogFragment()
         messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
-            DialogInterface.OnClickListener { _, _ ->
+            { _, _ ->
                 navToAccessibilityServiceSettingPage()
             })
         showDialog(messageDialogFragment)
@@ -203,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     private fun showOverlayConfirmDialog() {
         val messageDialogFragment = MessageDialogFragment()
         messageDialogFragment.init("", "检测到应用似乎还未被授予悬浮窗权限，是否前往开启权限？",
-            DialogInterface.OnClickListener { _, _ ->
+            { _, _ ->
                 startActivityForResult(
                     Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
