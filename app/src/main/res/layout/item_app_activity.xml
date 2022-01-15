@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/tv_activityName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#006569"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        tools:text="hello.leavesc.floatingwindow.MainActivity" />
-
+    android:id="@+id/tvActivityName"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:textColor="@android:color/white"
+    android:textSize="12sp" />
