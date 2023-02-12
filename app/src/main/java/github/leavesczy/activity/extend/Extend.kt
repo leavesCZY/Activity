@@ -1,11 +1,9 @@
 package github.leavesczy.activity.extend
 
 import android.accessibilityservice.AccessibilityService
-import android.app.Activity
 import android.content.*
 import android.provider.Settings
 import android.text.TextUtils
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -48,18 +46,6 @@ fun Context.clipboardCopy(msg: String) {
 fun Context.showToast(msg: String) {
     if (msg.isNotBlank()) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-    }
-}
-
-fun Activity.hideSoftKeyboard() {
-    val view = currentFocus
-    if (view != null) {
-        val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(
-            view.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
     }
 }
 

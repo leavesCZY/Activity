@@ -32,10 +32,9 @@ class LoadingDialog(context: Context) : Dialog(context, R.style.LoadingDialogThe
             0.5f
         )
         rotateAnimation.duration = 1000
-        rotateAnimation.repeatCount = -1
+        rotateAnimation.repeatCount = Animation.INFINITE
         rotateAnimation.interpolator = LinearInterpolator()
         rotateAnimation.repeatMode = Animation.RESTART
-
     }
 
     fun start(cancelable: Boolean = false, canceledOnTouchOutside: Boolean = false) {

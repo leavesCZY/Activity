@@ -56,7 +56,7 @@ class ActivityService : AccessibilityService() {
         Log.e(TAG, "onServiceConnected()")
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         Log.e(TAG, "onAccessibilityEvent()")
         windowView?.let {
@@ -69,9 +69,9 @@ class ActivityService : AccessibilityService() {
                     } else {
                         AppInfoHolder.getAppName(packageName)
                     }
-                    tvAppName?.text = appName + "(${packageName})"
+                    tvAppName?.text = "$appName : $packageName"
                     event.className?.let {
-                        activityList.add("${++itemIndex}" + " - " + event.className.toString())
+                        activityList.add("${++itemIndex}" + " : " + event.className.toString())
                         rvActivityList?.scrollToPosition(
                             activityRecyclerAdapter.itemCount - 1
                         )
@@ -123,7 +123,6 @@ class ActivityService : AccessibilityService() {
         val ivRemoveWindow = layoutView.findViewById<ImageView>(R.id.ivRemoveWindow)
         val tvAppName = layoutView.findViewById<TextView>(R.id.tvAppName)
         val rvActivityList = layoutView.findViewById<RecyclerView>(R.id.rvActivityList)
-
         layoutView.setOnTouchListener(FloatingOnTouchListener())
         ivExtendsWindow.setOnClickListener {
             if (rvActivityList.visibility == View.GONE) {
@@ -151,7 +150,6 @@ class ActivityService : AccessibilityService() {
         })
         rvActivityList.adapter = activityRecyclerAdapter
         rvActivityList.layoutManager = LinearLayoutManager(this)
-
         layoutParams = WindowManager.LayoutParams()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -159,14 +157,12 @@ class ActivityService : AccessibilityService() {
             layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE
         }
         layoutParams.gravity = Gravity.START or Gravity.TOP
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        layoutParams.flags =
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(layoutView, layoutParams)
-
         this.windowView = layoutView
         this.tvAppName = tvAppName
         this.rvActivityList = rvActivityList

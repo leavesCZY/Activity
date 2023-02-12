@@ -14,7 +14,7 @@ import java.util.*
  * @Desc:
  * @Github：https://github.com/leavesCZY
  */
-data class ApplicationLocal(
+data class AppInfo(
     val name: String,
     val packageName: String,
     val icon: Drawable,

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/common_margin">
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/ivAppSettings"
@@ -12,7 +12,7 @@
         android:layout_height="40dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/icon_settings"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -21,133 +21,143 @@
         android:layout_height="40dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/icon_copy"
-        app:layout_constraintRight_toLeftOf="@id/ivAppSettings"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ivAppSettings"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/ivAppIcon"
-        android:layout_width="66dp"
-        android:layout_height="66dp"
-        android:contentDescription="@string/app_name"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clAppInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivAppSettings"
-        tools:src="@mipmap/ic_launcher_round" />
+        app:layout_constraintTop_toBottomOf="@id/ivAppCopy">
 
-    <TextView
-        android:id="@+id/tvAppName"
-        style="@style/commonTextStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/common_margin"
-        android:layout_marginTop="@dimen/common_margin"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintEnd_toEndOf="@id/ivAppSettings"
-        app:layout_constraintStart_toEndOf="@id/ivAppIcon"
-        app:layout_constraintTop_toTopOf="@id/ivAppIcon"
-        tools:text="一个什么一个什么一个什么一个什么一个什么一个什么" />
+        <ImageView
+            android:id="@+id/ivAppIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@mipmap/ic_launcher_round" />
 
-    <TextView
-        android:id="@+id/tvAppPackage"
-        style="@style/commonTextStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        app:layout_constraintEnd_toEndOf="@id/tvAppName"
-        app:layout_constraintStart_toStartOf="@id/tvAppName"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName"
-        tools:text="leavesczy.hello.activity" />
+        <TextView
+            android:id="@+id/tvAppName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/tvAppPackage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivAppIcon"
+            app:layout_constraintTop_toTopOf="@id/ivAppIcon"
+            tools:text="@string/app_name" />
+
+        <TextView
+            android:id="@+id/tvAppPackage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/ivAppIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvAppName"
+            app:layout_constraintTop_toBottomOf="@id/tvAppName"
+            tools:text="@string/app_name" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tvAppVersionCode"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
-        app:layout_constraintTop_toBottomOf="@id/tvAppPackage"
-        tools:text="VersionCode：124" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clAppInfo"
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppVersionName"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
-        android:layout_height="17dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppVersionCode"
-        tools:text="VersionName：v2.1.2" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppMinSdkVersion"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@{applicationLocal.minSdkVersionFormat}"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppVersionName"
-        tools:text="MinSdkVersion：24" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppTargetSdkVersion"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppMinSdkVersion"
-        tools:text="TargetSdkVersion：24" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppSigMd5"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppTargetSdkVersion"
-        tools:text="SigMd5" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppSize"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppSigMd5"
-        tools:text="24MB" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppFirstInstallTime"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppSize"
-        tools:text="第一次安装时间：20190118 11:11" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppLastUpdateTime"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppFirstInstallTime"
-        tools:text="最后一次安装时间：20190119 11:11" />
+        tools:text="@string/app_name" />
 
     <TextView
         android:id="@+id/tvAppSourceDir"
-        style="@style/appShareTextStyle"
+        style="@style/AppShareTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/ivAppIcon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppLastUpdateTime"
-        tools:text="路径：app/system/leavesczy.hello.activity" />
+        tools:text="@string/app_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

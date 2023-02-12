@@ -1,21 +1,27 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-
-static String generateBuildTime() {
-    return new Date().format("yyyy_MM_dd_HH_mm_ss", TimeZone.getTimeZone('Asia/Shanghai'))
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
 }
 
+static String generateBuildTime() {
+    return new Date().format("yyyy_MM_dd_HH_mm_ss", TimeZone.getTimeZone("Asia/Shanghai"))
+}
+
+def keyAliasExt = "leavesCZY"
+def keyPasswordExt = "123456"
+def storePasswordExt = "123456"
+
 android {
-    compileSdk compileSdkVersionExt.toInteger()
-    buildToolsVersion buildToolsVersionExt.toString()
+    compileSdk 33
+    buildToolsVersion "33.0.2"
     defaultConfig {
-        applicationId applicationIdExt.toString()
-        minSdk minSdkVersionExt.toInteger()
-        targetSdk targetSdkVersionExt.toInteger()
-        versionCode versionCodeExt.toInteger()
-        versionName versionNameExt.toString()
+        applicationId "github.leavesczy.activity"
+        minSdk 23
+        targetSdk 33
+        versionCode 1
+        versionName "0.0.1"
+        resConfigs "zh"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs 'zh'
         vectorDrawables {
             useSupportLibrary true
         }
@@ -27,10 +33,10 @@ android {
     }
     signingConfigs {
         releaseConfig {
-            storeFile file("..\\key.jks")
+            storeFile file(rootDir.absolutePath + File.separator + "key.jks")
             keyAlias keyAliasExt.toString()
-            storePassword keyPasswordExt.toString()
-            keyPassword storePasswordExt.toString()
+            storePassword storePasswordExt.toString()
+            keyPassword keyPasswordExt.toString()
             v1SigningEnabled true
             v2SigningEnabled true
         }
@@ -42,7 +48,7 @@ android {
             shrinkResources false
             zipAlignEnabled false
             debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
         release {
             signingConfig signingConfigs.releaseConfig
@@ -50,7 +56,7 @@ android {
             shrinkResources true
             zipAlignEnabled true
             debuggable false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     compileOptions {
@@ -58,16 +64,18 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.4"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+    implementation "com.google.android.material:material:1.8.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 }

@@ -2,5 +2,5 @@
 <resources>
     <color name="windowTopBarBackground">#FF000000</color>
     <color name="windowBackground">#FF006569</color>
-    <color name="divider">#FFEFF1F3</color>
+    <color name="divider">#FF333333</color>
 </resources>

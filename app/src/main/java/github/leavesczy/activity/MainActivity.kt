@@ -1,29 +1,31 @@
 package github.leavesczy.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import github.leavesczy.activity.adapter.AppRecyclerAdapter
 import github.leavesczy.activity.extend.*
 import github.leavesczy.activity.holder.AppInfoHolder
-import github.leavesczy.activity.model.ApplicationLocal
+import github.leavesczy.activity.model.AppInfo
 import github.leavesczy.activity.service.ActivityService
-import github.leavesczy.activity.widget.AppDialogFragment
+import github.leavesczy.activity.widget.AppInfoDialog
 import github.leavesczy.activity.widget.CommonItemDecoration
 import github.leavesczy.activity.widget.LoadingDialog
 import github.leavesczy.activity.widget.MessageDialogFragment
-import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @Author: leavesCZY
@@ -33,51 +35,37 @@ import java.util.*
  */
 class MainActivity : AppCompatActivity() {
 
-    companion object {
+    private val overlayPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (canDrawOverlays) {
+                showAccessibilityConfirmDialog()
+            } else {
+                showToast("请授予悬浮窗权限")
+            }
+        }
 
-        private const val REQUEST_CODE_OVERLAYS = 10
-
+    private val rvAppList by lazy {
+        findViewById<RecyclerView>(R.id.rvAppList)
     }
 
-    private lateinit var appList: MutableList<ApplicationLocal>
+    private var appList = mutableListOf<AppInfo>()
 
-    private lateinit var appRecyclerAdapter: AppRecyclerAdapter
+    private val appRecyclerAdapter = AppRecyclerAdapter(appList)
 
     private var progressDialog: LoadingDialog? = null
-
-    private val loadAppThread = HandlerThread("loadApp")
-
-    private val loadAppHandler by lazy {
-        Handler(loadAppThread.looper, Handler.Callback {
-            if (this.isDestroyed || this.isFinishing) {
-                return@Callback true
-            }
-            runOnUiThread {
-                startLoading()
-            }
-            AppInfoHolder.init(this@MainActivity)
-            appList = AppInfoHolder.getAllApplication(this@MainActivity)
-            runOnUiThread {
-                if (this.isDestroyed || this.isFinishing) {
-                    return@runOnUiThread
-                }
-                initView()
-                cancelLoading()
-            }
-            return@Callback true
-        })
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        loadAppThread.start()
-        loadAppHandler.sendEmptyMessage(1)
+        initView()
+        lifecycleScope.launch {
+            loadApps()
+        }
     }
 
     private fun initView() {
-        appRecyclerAdapter = AppRecyclerAdapter(appList)
-        val rvAppList = findViewById<RecyclerView>(R.id.rvAppList)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
         rvAppList.layoutManager = LinearLayoutManager(this)
         rvAppList.adapter = appRecyclerAdapter
         rvAppList.addItemDecoration(
@@ -88,70 +76,58 @@ class MainActivity : AppCompatActivity() {
         )
         appRecyclerAdapter.setOnItemClickListener(object : AppRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                hideSoftKeyboard()
-                val fragment = AppDialogFragment()
+                val fragment = AppInfoDialog()
                 fragment.applicationInfo = appList[position]
                 showDialog(fragment)
             }
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        menu?.let {
-            val menuItem = menu.findItem(R.id.menu_search)
-            val searchView: SearchView = MenuItemCompat.getActionView(menuItem) as SearchView
-            searchView.setIconifiedByDefault(false)
-            searchView.queryHint = "Search App Name"
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextChange(value: String?): Boolean {
-                    return true
-                }
-
-                override fun onQueryTextSubmit(value: String?): Boolean {
-                    value?.let { s ->
-                        if (s.isNotEmpty()) {
-                            val find = AppInfoHolder.getAllApplication(this@MainActivity).find {
-                                it.name.lowercase(Locale.CHINA)
-                                    .contains(value.lowercase(Locale.CHINA))
-                            }
-                            if (find == null) {
-                                showToast("没有找到应用")
-                            } else {
-                                searchView.isIconified = true
-                                hideSoftKeyboard()
-                                showAppInfoDialog(find)
-                            }
-                        }
-                    }
-                    return true
-                }
-            }
-            )
+    @SuppressLint("NotifyDataSetChanged")
+    private suspend fun loadApps() {
+        withContext(context = Dispatchers.Main.immediate) {
+            startLoading()
         }
-        return super.onCreateOptionsMenu(menu)
+        withContext(context = Dispatchers.IO) {
+            AppInfoHolder.init(context = applicationContext)
+            val list = AppInfoHolder.getAllApplication()
+            appList.clear()
+            appList.addAll(list)
+        }
+        withContext(context = Dispatchers.Main.immediate) {
+            appRecyclerAdapter.notifyDataSetChanged()
+            cancelLoading()
+        }
     }
 
-    private fun showAppInfoDialog(applicationLocal: ApplicationLocal) {
-        val fragment = AppDialogFragment()
-        fragment.applicationInfo = applicationLocal
-        showDialog(fragment)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         item.apply {
             when (item.itemId) {
-                R.id.menuAllApp -> {
+                R.id.menuAllApp, R.id.menuSystemApp, R.id.menuNormalApp -> {
+                    val list = when (item.itemId) {
+                        R.id.menuAllApp -> {
+                            AppInfoHolder.getAllApplication()
+                        }
+                        R.id.menuSystemApp -> {
+                            AppInfoHolder.getAllSystemApplication()
+                        }
+                        R.id.menuNormalApp -> {
+                            AppInfoHolder.getAllNonSystemApplication()
+                        }
+                        else -> {
+                            emptyList()
+                        }
+                    }
                     appList.clear()
-                    appList.addAll(AppInfoHolder.getAllApplication(this@MainActivity))
-                }
-                R.id.menuSystemApp -> {
-                    appList.clear()
-                    appList.addAll(AppInfoHolder.getAllSystemApplication(this@MainActivity))
-                }
-                R.id.menuNormalApp -> {
-                    appList.clear()
-                    appList.addAll(AppInfoHolder.getAllNonSystemApplication(this@MainActivity))
+                    appList.addAll(list)
+                    appRecyclerAdapter.notifyDataSetChanged()
+                    rvAppList.scrollToPosition(0)
                 }
                 R.id.menuCurrentActivity -> {
                     if (canDrawOverlays) {
@@ -161,7 +137,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            appRecyclerAdapter.notifyDataSetChanged()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -203,12 +178,11 @@ class MainActivity : AppCompatActivity() {
         val messageDialogFragment = MessageDialogFragment()
         messageDialogFragment.init("", "检测到应用似乎还未被授予悬浮窗权限，是否前往开启权限？",
             { _, _ ->
-                startActivityForResult(
+                overlayPermissionLauncher.launch(
                     Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:${BuildConfig.APPLICATION_ID}")
-                    ),
-                    REQUEST_CODE_OVERLAYS
+                    )
                 )
             })
         showDialog(messageDialogFragment)
@@ -218,34 +192,15 @@ class MainActivity : AppCompatActivity() {
         startService(Intent(this, ActivityService::class.java))
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_CODE_OVERLAYS -> {
-                if (canDrawOverlays) {
-                    showAccessibilityConfirmDialog()
-                } else {
-                    showToast("请授予悬浮窗权限")
-                }
-            }
-        }
-    }
-
-    private fun startLoading(cancelable: Boolean = false) {
+    private fun startLoading() {
         if (progressDialog == null) {
             progressDialog = LoadingDialog(this)
         }
-        progressDialog?.start(cancelable, cancelable)
+        progressDialog?.start(cancelable = false, canceledOnTouchOutside = false)
     }
 
     private fun cancelLoading() {
         progressDialog?.dismiss()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        loadAppThread.quitSafely()
-        loadAppHandler.removeCallbacksAndMessages(null)
     }
 
 }

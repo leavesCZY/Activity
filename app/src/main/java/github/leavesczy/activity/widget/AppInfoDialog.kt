@@ -14,8 +14,7 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import github.leavesczy.activity.R
 import github.leavesczy.activity.extend.clipboardCopy
 import github.leavesczy.activity.extend.showToast
-import github.leavesczy.activity.model.ApplicationLocal
-import java.io.File
+import github.leavesczy.activity.model.AppInfo
 
 /**
  * @Author: leavesCZY
@@ -23,9 +22,9 @@ import java.io.File
  * @Desc:
  * @Github：https://github.com/leavesCZY
  */
-class AppDialogFragment : AppCompatDialogFragment() {
+class AppInfoDialog : AppCompatDialogFragment() {
 
-    lateinit var applicationInfo: ApplicationLocal
+    var applicationInfo: AppInfo? = null
 
     init {
         setStyle(STYLE_NO_TITLE, 0)
@@ -42,47 +41,40 @@ class AppDialogFragment : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<ImageView>(R.id.ivAppIcon).setImageDrawable(applicationInfo.icon)
-        view.findViewById<TextView>(R.id.tvAppName).text = applicationInfo.name
-        view.findViewById<TextView>(R.id.tvAppPackage).text = applicationInfo.packageName
-        view.findViewById<TextView>(R.id.tvAppVersionName).text = applicationInfo.versionNameFormat
+        val mApplicationInfo = applicationInfo
+        if (mApplicationInfo == null) {
+            dismiss()
+            return
+        }
+        view.findViewById<ImageView>(R.id.ivAppIcon).setImageDrawable(mApplicationInfo.icon)
+        view.findViewById<TextView>(R.id.tvAppName).text = mApplicationInfo.name
+        view.findViewById<TextView>(R.id.tvAppPackage).text = mApplicationInfo.packageName
+        view.findViewById<TextView>(R.id.tvAppVersionName).text = mApplicationInfo.versionNameFormat
         view.findViewById<TextView>(R.id.tvAppTargetSdkVersion).text =
-            applicationInfo.targetSdkVersionFormat
+            mApplicationInfo.targetSdkVersionFormat
         view.findViewById<TextView>(R.id.tvAppMinSdkVersion).text =
-            applicationInfo.minSdkVersionFormat
+            mApplicationInfo.minSdkVersionFormat
         view.findViewById<TextView>(R.id.tvAppVersionCode).text =
-            applicationInfo.versionCodeFormat
-        view.findViewById<TextView>(R.id.tvAppSigMd5).text = applicationInfo.sigMd5Format
-        view.findViewById<TextView>(R.id.tvAppSize).text = applicationInfo.apkSizeFormat
+            mApplicationInfo.versionCodeFormat
+        view.findViewById<TextView>(R.id.tvAppSigMd5).text = mApplicationInfo.sigMd5Format
+        view.findViewById<TextView>(R.id.tvAppSize).text = mApplicationInfo.apkSizeFormat
         view.findViewById<TextView>(R.id.tvAppFirstInstallTime).text =
-            applicationInfo.firstInstallTimeFormat
+            mApplicationInfo.firstInstallTimeFormat
         view.findViewById<TextView>(R.id.tvAppLastUpdateTime).text =
-            applicationInfo.lastInstallTimeFormat
-        view.findViewById<TextView>(R.id.tvAppSourceDir).text = applicationInfo.sourceDirFormat
+            mApplicationInfo.lastInstallTimeFormat
+        view.findViewById<TextView>(R.id.tvAppSourceDir).text = mApplicationInfo.sourceDirFormat
         view.findViewById<View>(R.id.ivAppSettings).setOnClickListener {
+            val context = activity
             context?.let {
-                openAppSettings(it, applicationInfo.packageName)
+                openAppSettings(it, mApplicationInfo.packageName)
             }
         }
         view.findViewById<View>(R.id.ivAppCopy).setOnClickListener {
             val context = activity
             context?.let {
-                it.clipboardCopy(applicationInfo.toString())
+                it.clipboardCopy(mApplicationInfo.toString())
                 it.showToast("已复制应用信息")
             }
-        }
-    }
-
-    private fun shareApp(sourceDir: String) {
-        val apkFile = File(sourceDir)
-        val intent = Intent()
-        intent.action = Intent.ACTION_SEND
-        intent.type = "*/*"
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(apkFile))
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

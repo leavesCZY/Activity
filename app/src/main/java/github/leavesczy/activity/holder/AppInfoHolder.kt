@@ -5,7 +5,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import github.leavesczy.activity.model.ApplicationLocal
+import github.leavesczy.activity.model.AppInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 
 /**
@@ -20,35 +22,43 @@ object AppInfoHolder {
         AllApplication, NonSystemApplication, SystemApplication
     }
 
-    private val appMap = mutableMapOf<String, ApplicationLocal>()
+    private val lock = Any()
 
-    fun init(context: Context) {
-        appMap.clear()
-        val packageInfoList =
-            context.packageManager.getInstalledPackages(PackageManager.GET_SIGNATURES)
-        for (packageInfo in packageInfoList) {
-            val applicationInfo = packageInfo.applicationInfo
-            val application = ApplicationLocal(
-                packageName = packageInfo.packageName,
-                versionName = packageInfo.versionName ?: "",
-                targetSdkVersion = applicationInfo.targetSdkVersion,
-                minSdkVersion = if (Build.VERSION.SDK_INT > 23) applicationInfo.minSdkVersion else 0,
-                longVersionCode = packageInfo.versionCode.toLong(),
-                firstInstallTime = packageInfo.firstInstallTime,
-                lastUpdateTime = packageInfo.lastUpdateTime,
-                isSystemApp = isSystemApplication(packageInfo),
-                icon = applicationInfo.loadIcon(context.packageManager),
-                name = applicationInfo.loadLabel(context.packageManager).toString(),
-                sourceDir = applicationInfo.sourceDir,
-                dataDir = applicationInfo.dataDir,
-                sigMd5 = packageInfo.signatures?.let {
-                    if (packageInfo.signatures.isNotEmpty())
-                        getSignValidString(packageInfo.signatures[0].toByteArray())
-                    else
-                        ""
-                } ?: ""
-            )
-            appMap[application.name] = application
+    private val appCache = mutableMapOf<String, AppInfo>()
+
+    suspend fun init(context: Context) {
+        withContext(context = Dispatchers.IO) {
+            val map = mutableMapOf<String, AppInfo>()
+            val packageInfoList =
+                context.packageManager.getInstalledPackages(PackageManager.GET_SIGNATURES)
+            for (packageInfo in packageInfoList) {
+                val applicationInfo = packageInfo.applicationInfo
+                val application = AppInfo(
+                    packageName = packageInfo.packageName,
+                    versionName = packageInfo.versionName ?: "",
+                    targetSdkVersion = applicationInfo.targetSdkVersion,
+                    minSdkVersion = if (Build.VERSION.SDK_INT > 23) applicationInfo.minSdkVersion else 0,
+                    longVersionCode = packageInfo.versionCode.toLong(),
+                    firstInstallTime = packageInfo.firstInstallTime,
+                    lastUpdateTime = packageInfo.lastUpdateTime,
+                    isSystemApp = isSystemApplication(packageInfo),
+                    icon = applicationInfo.loadIcon(context.packageManager),
+                    name = applicationInfo.loadLabel(context.packageManager).toString(),
+                    sourceDir = applicationInfo.sourceDir,
+                    dataDir = applicationInfo.dataDir,
+                    sigMd5 = packageInfo.signatures?.let {
+                        if (packageInfo.signatures.isNotEmpty())
+                            getSignValidString(packageInfo.signatures[0].toByteArray())
+                        else
+                            ""
+                    } ?: ""
+                )
+                map[application.name] = application
+            }
+            synchronized(lock = lock) {
+                appCache.clear()
+                appCache.putAll(map)
+            }
         }
     }
 
@@ -61,7 +71,7 @@ object AppInfoHolder {
     private fun toHexString(keyData: ByteArray): String {
         val strBuilder = StringBuilder(keyData.size * 2)
         for (keyDatum in keyData) {
-            var hexStr = Integer.toString(keyDatum.toInt() and 255, 16)
+            var hexStr = (keyDatum.toInt() and 255).toString(16)
             if (hexStr.length == 1) {
                 hexStr = "0$hexStr"
             }
@@ -70,75 +80,45 @@ object AppInfoHolder {
         return strBuilder.toString()
     }
 
-    /**
-     * 获取设备的应用信息
-     */
-    private fun getApplicationInfo(
-        context: Context,
-        applicationType: ApplicationType
-    ): MutableList<ApplicationLocal> {
-        if (appMap.isEmpty()) {
-            init(context)
+    private fun isSystemApplication(packageInfo: PackageInfo): Boolean {
+        return packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+    }
+
+    fun getAppName(packageName: String): String {
+        for (value in appCache.values) {
+            if (value.packageName == packageName) {
+                return value.name
+            }
         }
-        val applicationList = mutableListOf<ApplicationLocal>()
+        return ""
+    }
+
+    private fun getApplicationInfo(applicationType: ApplicationType): List<AppInfo> {
+        val applicationList = mutableListOf<AppInfo>()
         when (applicationType) {
             ApplicationType.AllApplication -> {
-                applicationList.addAll(appMap.values)
+                applicationList.addAll(appCache.values)
             }
             ApplicationType.SystemApplication -> {
-                applicationList.addAll(appMap.filter { entry -> entry.value.isSystemApp }.values)
+                applicationList.addAll(appCache.filter { entry -> entry.value.isSystemApp }.values)
             }
             ApplicationType.NonSystemApplication -> {
-                applicationList.addAll(appMap.filter { entry -> !entry.value.isSystemApp }.values)
+                applicationList.addAll(appCache.filter { entry -> !entry.value.isSystemApp }.values)
             }
         }
         return applicationList
     }
 
-    /**
-     * 判断是否是系统应用
-     */
-    private fun isSystemApplication(packageInfo: PackageInfo): Boolean {
-        return packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+    fun getAllApplication(): List<AppInfo> {
+        return getApplicationInfo(ApplicationType.AllApplication)
     }
 
-    /**
-     * 获取设备所有的应用
-     */
-    fun getAllApplication(context: Context): MutableList<ApplicationLocal> {
-        return getApplicationInfo(
-            context,
-            ApplicationType.AllApplication
-        )
+    fun getAllSystemApplication(): List<AppInfo> {
+        return getApplicationInfo(ApplicationType.SystemApplication)
     }
 
-    /**
-     * 获取设备所有的系统应用
-     */
-    fun getAllSystemApplication(context: Context): List<ApplicationLocal> {
-        return getApplicationInfo(
-            context,
-            ApplicationType.SystemApplication
-        )
-    }
-
-    /**
-     * 获取设备所有的非系统应用
-     */
-    fun getAllNonSystemApplication(context: Context): List<ApplicationLocal> {
-        return getApplicationInfo(
-            context,
-            ApplicationType.NonSystemApplication
-        )
-    }
-
-    fun getAppName(packageName: String): String? {
-        for (value in appMap.values) {
-            if (value.packageName == packageName) {
-                return value.name
-            }
-        }
-        return null
+    fun getAllNonSystemApplication(): List<AppInfo> {
+        return getApplicationInfo(ApplicationType.NonSystemApplication)
     }
 
 }

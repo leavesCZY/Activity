@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import github.leavesczy.activity.R
-import github.leavesczy.activity.model.ApplicationLocal
+import github.leavesczy.activity.model.AppInfo
 
 /**
  * @Author: leavesCZY
@@ -15,8 +15,14 @@ import github.leavesczy.activity.model.ApplicationLocal
  * @Desc:
  * @Github：https://github.com/leavesCZY
  */
-class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
+class AppRecyclerAdapter(private val appInfoList: List<AppInfo>) :
     RecyclerView.Adapter<AppRecyclerAdapter.AppViewHolder>() {
+
+    class AppViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+        val ivAppIcon: ImageView = view.findViewById(R.id.ivAppIcon)
+        val tvAppName: TextView = view.findViewById(R.id.tvAppName)
+        val tvAppPackageName: TextView = view.findViewById(R.id.tvAppPackageName)
+    }
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -25,13 +31,13 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
     private var onItemClickListener: OnItemClickListener? = null
 
     override fun getItemCount(): Int {
-        return if (appList.isNullOrEmpty()) 0 else appList.size
+        return appInfoList.size
     }
 
     override fun onBindViewHolder(viewHolder: AppViewHolder, position: Int) {
-        viewHolder.ivAppIcon.setImageDrawable(appList[position].icon)
-        viewHolder.tvAppName.text = appList[position].name
-        viewHolder.tvAppPackageName.text = appList[position].packageName
+        viewHolder.ivAppIcon.setImageDrawable(appInfoList[position].icon)
+        viewHolder.tvAppName.text = appInfoList[position].name
+        viewHolder.tvAppPackageName.text = appInfoList[position].packageName
         viewHolder.itemView.setOnClickListener {
             onItemClickListener?.onItemClick(position)
         }
@@ -41,14 +47,6 @@ class AppRecyclerAdapter(private val appList: MutableList<ApplicationLocal>) :
         return AppViewHolder(
             LayoutInflater.from(viewGroup.context).inflate(R.layout.item_app, viewGroup, false)
         )
-    }
-
-    class AppViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-
-        val ivAppIcon = view.findViewById<ImageView>(R.id.ivAppIcon)
-        val tvAppName = view.findViewById<TextView>(R.id.tvAppName)
-        val tvAppPackageName = view.findViewById<TextView>(R.id.tvAppPackageName)
-
     }
 
     fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
