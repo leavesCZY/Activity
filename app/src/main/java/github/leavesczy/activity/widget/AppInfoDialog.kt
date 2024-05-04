@@ -12,9 +12,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialogFragment
 import github.leavesczy.activity.R
-import github.leavesczy.activity.extend.clipboardCopy
-import github.leavesczy.activity.extend.showToast
-import github.leavesczy.activity.model.AppInfo
+import github.leavesczy.activity.holder.AccessibilityUtils.clipboardCopy
+import github.leavesczy.activity.holder.AccessibilityUtils.showToast
+import github.leavesczy.activity.model.ApplicationDetail
 
 /**
  * @Author: leavesCZY
@@ -24,7 +24,7 @@ import github.leavesczy.activity.model.AppInfo
  */
 class AppInfoDialog : AppCompatDialogFragment() {
 
-    var applicationInfo: AppInfo? = null
+    var applicationDetail: ApplicationDetail? = null
 
     init {
         setStyle(STYLE_NO_TITLE, 0)
@@ -41,7 +41,7 @@ class AppInfoDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mApplicationInfo = applicationInfo
+        val mApplicationInfo = applicationDetail
         if (mApplicationInfo == null) {
             dismiss()
             return
@@ -72,8 +72,8 @@ class AppInfoDialog : AppCompatDialogFragment() {
         view.findViewById<View>(R.id.ivAppCopy).setOnClickListener {
             val context = activity
             context?.let {
-                it.clipboardCopy(mApplicationInfo.toString())
-                it.showToast("已复制应用信息")
+                it.clipboardCopy(msg = mApplicationInfo.toString())
+                it.showToast(msg = "已复制应用信息")
             }
         }
     }

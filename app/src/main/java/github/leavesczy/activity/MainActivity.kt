@@ -11,13 +11,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import github.leavesczy.activity.adapter.AppRecyclerAdapter
-import github.leavesczy.activity.extend.*
-import github.leavesczy.activity.holder.AppInfoHolder
-import github.leavesczy.activity.model.AppInfo
+import github.leavesczy.activity.holder.AccessibilityUtils
+import github.leavesczy.activity.holder.AccessibilityUtils.canDrawOverlays
+import github.leavesczy.activity.holder.AccessibilityUtils.showToast
+import github.leavesczy.activity.holder.AppInfoLoader
+import github.leavesczy.activity.holder.ApplicationType
+import github.leavesczy.activity.model.ApplicationDetail
 import github.leavesczy.activity.service.ActivityService
 import github.leavesczy.activity.widget.AppInfoDialog
 import github.leavesczy.activity.widget.CommonItemDecoration
@@ -40,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             if (canDrawOverlays) {
                 showAccessibilityConfirmDialog()
             } else {
-                showToast("请授予悬浮窗权限")
+                showToast(msg = "请授予悬浮窗权限")
             }
         }
 
@@ -48,9 +52,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<RecyclerView>(R.id.rvAppList)
     }
 
-    private var appList = mutableListOf<AppInfo>()
+    private var applicationDetails = mutableListOf<ApplicationDetail>()
 
-    private val appRecyclerAdapter = AppRecyclerAdapter(appList)
+    private val appRecyclerAdapter = AppRecyclerAdapter(applicationDetails)
 
     private var progressDialog: LoadingDialog? = null
 
@@ -77,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         appRecyclerAdapter.setOnItemClickListener(object : AppRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val fragment = AppInfoDialog()
-                fragment.applicationInfo = appList[position]
+                fragment.applicationDetail = applicationDetails[position]
                 showDialog(fragment)
             }
         })
@@ -85,16 +89,13 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private suspend fun loadApps() {
-        withContext(context = Dispatchers.Main.immediate) {
+        withContext(context = Dispatchers.Main) {
             startLoading()
-        }
-        withContext(context = Dispatchers.IO) {
-            AppInfoHolder.init(context = applicationContext)
-            val list = AppInfoHolder.getAllApplication()
-            appList.clear()
-            appList.addAll(list)
-        }
-        withContext(context = Dispatchers.Main.immediate) {
+            AppInfoLoader.init(context = applicationContext)
+            val list =
+                AppInfoLoader.filterApplications(applicationType = ApplicationType.AllApplication)
+            applicationDetails.clear()
+            applicationDetails.addAll(list)
             appRecyclerAdapter.notifyDataSetChanged()
             cancelLoading()
         }
@@ -105,30 +106,21 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         item.apply {
             when (item.itemId) {
-                R.id.menuAllApp, R.id.menuSystemApp, R.id.menuNormalApp -> {
-                    val list = when (item.itemId) {
-                        R.id.menuAllApp -> {
-                            AppInfoHolder.getAllApplication()
-                        }
-                        R.id.menuSystemApp -> {
-                            AppInfoHolder.getAllSystemApplication()
-                        }
-                        R.id.menuNormalApp -> {
-                            AppInfoHolder.getAllNonSystemApplication()
-                        }
-                        else -> {
-                            emptyList()
-                        }
-                    }
-                    appList.clear()
-                    appList.addAll(list)
-                    appRecyclerAdapter.notifyDataSetChanged()
-                    rvAppList.scrollToPosition(0)
+                R.id.menuAllApp -> {
+                    filterApplications(applicationType = ApplicationType.AllApplication)
                 }
+
+                R.id.menuSystemApp -> {
+                    filterApplications(applicationType = ApplicationType.SystemApplication)
+                }
+
+                R.id.menuNormalApp -> {
+                    filterApplications(applicationType = ApplicationType.NonSystemApplication)
+                }
+
                 R.id.menuCurrentActivity -> {
                     if (canDrawOverlays) {
                         requestAccessibilityPermission()
@@ -141,8 +133,17 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterApplications(applicationType: ApplicationType) {
+        val applications = AppInfoLoader.filterApplications(applicationType = applicationType)
+        applicationDetails.clear()
+        applicationDetails.addAll(applications)
+        appRecyclerAdapter.notifyDataSetChanged()
+        rvAppList.scrollToPosition(0)
+    }
+
     private fun requestAccessibilityPermission() {
-        if (accessibilityServiceIsEnabled(ActivityService::class.java)) {
+        if (accessibilityServiceIsEnabled()) {
             if (canDrawOverlays) {
                 startActivityService()
             } else {
@@ -155,7 +156,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestOverlayPermission() {
         if (canDrawOverlays) {
-            if (accessibilityServiceIsEnabled(ActivityService::class.java)) {
+            if (accessibilityServiceIsEnabled()) {
                 startActivityService()
             } else {
                 showAccessibilityConfirmDialog()
@@ -167,9 +168,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAccessibilityConfirmDialog() {
         val messageDialogFragment = MessageDialogFragment()
-        messageDialogFragment.init("", "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
+        messageDialogFragment.init(
+            "",
+            "检测到应用似乎还未被授予无障碍服务权限，是否前往开启权限？",
             { _, _ ->
-                navToAccessibilityServiceSettingPage()
+                AccessibilityUtils.navToAccessibilityServiceSettingPage(context = this)
             })
         showDialog(messageDialogFragment)
     }
@@ -181,11 +184,22 @@ class MainActivity : AppCompatActivity() {
                 overlayPermissionLauncher.launch(
                     Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+                        Uri.parse("package:${packageName}")
                     )
                 )
             })
         showDialog(messageDialogFragment)
+    }
+
+    private fun showDialog(dialogFragment: DialogFragment) {
+        dialogFragment.show(supportFragmentManager, dialogFragment.javaClass.name)
+    }
+
+    private fun accessibilityServiceIsEnabled(): Boolean {
+        return AccessibilityUtils.accessibilityServiceIsEnabled(
+            context = this,
+            accessibilityService = ActivityService::class.java
+        )
     }
 
     private fun startActivityService() {

@@ -1,7 +1,6 @@
 package github.leavesczy.activity
 
 import android.app.Application
-import github.leavesczy.activity.holder.ContextHolder
 
 /**
  * @Author: leavesCZY
@@ -11,9 +10,15 @@ import github.leavesczy.activity.holder.ContextHolder
  */
 class ActivityApplication : Application() {
 
+    companion object {
+
+        lateinit var context: Application
+
+    }
+
     override fun onCreate() {
         super.onCreate()
-        ContextHolder.init(context = this)
+        context = this
     }
 
 }

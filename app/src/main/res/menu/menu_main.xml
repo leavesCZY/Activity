@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/menuAllApp"
         android:orderInCategory="1"
         android:title="所有应用"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/menuSystemApp"
         android:orderInCategory="2"
         android:title="系统应用"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/menuNormalApp"
         android:orderInCategory="3"
         android:title="用户应用"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/menuCurrentActivity"
         android:orderInCategory="4"
         android:title="当前 Activity"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
 
 </menu>

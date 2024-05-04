@@ -5,35 +5,34 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import github.leavesczy.activity.model.AppInfo
+import github.leavesczy.activity.model.ApplicationDetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 
 /**
  * @Author: leavesCZY
- * @Date: 2019/1/2 20:42
+ * @Date: 2024/5/4 0:55
  * @Desc:
- * @Github：https://github.com/leavesCZY
  */
-object AppInfoHolder {
+enum class ApplicationType {
+    AllApplication,
+    NonSystemApplication,
+    SystemApplication
+}
 
-    private enum class ApplicationType {
-        AllApplication, NonSystemApplication, SystemApplication
-    }
+object AppInfoLoader {
 
-    private val lock = Any()
-
-    private val appCache = mutableMapOf<String, AppInfo>()
+    private val appCache = mutableMapOf<String, ApplicationDetail>()
 
     suspend fun init(context: Context) {
-        withContext(context = Dispatchers.IO) {
-            val map = mutableMapOf<String, AppInfo>()
+        withContext(context = Dispatchers.Default) {
+            val map = mutableMapOf<String, ApplicationDetail>()
             val packageInfoList =
                 context.packageManager.getInstalledPackages(PackageManager.GET_SIGNATURES)
             for (packageInfo in packageInfoList) {
                 val applicationInfo = packageInfo.applicationInfo
-                val application = AppInfo(
+                val applicationDetail = ApplicationDetail(
                     packageName = packageInfo.packageName,
                     versionName = packageInfo.versionName ?: "",
                     targetSdkVersion = applicationInfo.targetSdkVersion,
@@ -53,31 +52,35 @@ object AppInfoHolder {
                             ""
                     } ?: ""
                 )
-                map[application.name] = application
+                map[applicationDetail.name] = applicationDetail
             }
-            synchronized(lock = lock) {
+            synchronized(lock = this@AppInfoLoader) {
                 appCache.clear()
                 appCache.putAll(map)
             }
         }
     }
 
-    private fun getSignValidString(signatures: ByteArray): String {
-        val messageDigest = MessageDigest.getInstance("MD5")
-        messageDigest.update(signatures)
-        return toHexString(messageDigest.digest())
+    private suspend fun getSignValidString(signatures: ByteArray): String {
+        return withContext(context = Dispatchers.Default) {
+            val messageDigest = MessageDigest.getInstance("MD5")
+            messageDigest.update(signatures)
+            return@withContext toHexString(messageDigest.digest())
+        }
     }
 
-    private fun toHexString(keyData: ByteArray): String {
-        val strBuilder = StringBuilder(keyData.size * 2)
-        for (keyDatum in keyData) {
-            var hexStr = (keyDatum.toInt() and 255).toString(16)
-            if (hexStr.length == 1) {
-                hexStr = "0$hexStr"
+    private suspend fun toHexString(keyData: ByteArray): String {
+        return withContext(context = Dispatchers.Default) {
+            val strBuilder = StringBuilder(keyData.size * 2)
+            for (keyDatum in keyData) {
+                var hexStr = (keyDatum.toInt() and 255).toString(16)
+                if (hexStr.length == 1) {
+                    hexStr = "0$hexStr"
+                }
+                strBuilder.append(hexStr)
             }
-            strBuilder.append(hexStr)
+            return@withContext strBuilder.toString()
         }
-        return strBuilder.toString()
     }
 
     private fun isSystemApplication(packageInfo: PackageInfo): Boolean {
@@ -93,32 +96,24 @@ object AppInfoHolder {
         return ""
     }
 
-    private fun getApplicationInfo(applicationType: ApplicationType): List<AppInfo> {
-        val applicationList = mutableListOf<AppInfo>()
-        when (applicationType) {
+    fun filterApplications(applicationType: ApplicationType): List<ApplicationDetail> {
+        return when (applicationType) {
             ApplicationType.AllApplication -> {
-                applicationList.addAll(appCache.values)
+                appCache.values.toList()
             }
+
             ApplicationType.SystemApplication -> {
-                applicationList.addAll(appCache.filter { entry -> entry.value.isSystemApp }.values)
+                appCache.values.filter {
+                    it.isSystemApp
+                }
             }
+
             ApplicationType.NonSystemApplication -> {
-                applicationList.addAll(appCache.filter { entry -> !entry.value.isSystemApp }.values)
+                appCache.values.filter {
+                    !it.isSystemApp
+                }
             }
         }
-        return applicationList
-    }
-
-    fun getAllApplication(): List<AppInfo> {
-        return getApplicationInfo(ApplicationType.AllApplication)
-    }
-
-    fun getAllSystemApplication(): List<AppInfo> {
-        return getApplicationInfo(ApplicationType.SystemApplication)
-    }
-
-    fun getAllNonSystemApplication(): List<AppInfo> {
-        return getApplicationInfo(ApplicationType.NonSystemApplication)
     }
 
 }

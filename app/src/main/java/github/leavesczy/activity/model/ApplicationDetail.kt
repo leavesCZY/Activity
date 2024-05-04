@@ -3,10 +3,11 @@ package github.leavesczy.activity.model
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.text.format.Formatter
-import github.leavesczy.activity.holder.ContextHolder
+import github.leavesczy.activity.ActivityApplication
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /**
  * @Author: leavesCZY
@@ -14,7 +15,7 @@ import java.util.*
  * @Desc:
  * @Github：https://github.com/leavesCZY
  */
-data class AppInfo(
+data class ApplicationDetail(
     val name: String,
     val packageName: String,
     val icon: Drawable,
@@ -81,7 +82,7 @@ data class AppInfo(
             val size = if (TextUtils.isEmpty(sourceDir)) {
                 ""
             } else {
-                Formatter.formatShortFileSize(ContextHolder.context, File(sourceDir).length())
+                Formatter.formatShortFileSize(ActivityApplication.context, File(sourceDir).length())
             }
             return "apkSize：$size"
         }

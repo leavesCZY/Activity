@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import github.leavesczy.activity.R
-import github.leavesczy.activity.model.AppInfo
+import github.leavesczy.activity.model.ApplicationDetail
 
 /**
  * @Author: leavesCZY
@@ -15,10 +15,10 @@ import github.leavesczy.activity.model.AppInfo
  * @Desc:
  * @Github：https://github.com/leavesCZY
  */
-class AppRecyclerAdapter(private val appInfoList: List<AppInfo>) :
+class AppRecyclerAdapter(private val applicationDetails: List<ApplicationDetail>) :
     RecyclerView.Adapter<AppRecyclerAdapter.AppViewHolder>() {
 
-    class AppViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+    class AppViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivAppIcon: ImageView = view.findViewById(R.id.ivAppIcon)
         val tvAppName: TextView = view.findViewById(R.id.tvAppName)
         val tvAppPackageName: TextView = view.findViewById(R.id.tvAppPackageName)
@@ -31,13 +31,13 @@ class AppRecyclerAdapter(private val appInfoList: List<AppInfo>) :
     private var onItemClickListener: OnItemClickListener? = null
 
     override fun getItemCount(): Int {
-        return appInfoList.size
+        return applicationDetails.size
     }
 
     override fun onBindViewHolder(viewHolder: AppViewHolder, position: Int) {
-        viewHolder.ivAppIcon.setImageDrawable(appInfoList[position].icon)
-        viewHolder.tvAppName.text = appInfoList[position].name
-        viewHolder.tvAppPackageName.text = appInfoList[position].packageName
+        viewHolder.ivAppIcon.setImageDrawable(applicationDetails[position].icon)
+        viewHolder.tvAppName.text = applicationDetails[position].name
+        viewHolder.tvAppPackageName.text = applicationDetails[position].packageName
         viewHolder.itemView.setOnClickListener {
             onItemClickListener?.onItemClick(position)
         }

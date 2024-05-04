@@ -6,7 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,10 +20,10 @@ import androidx.recyclerview.widget.RecyclerView
 import github.leavesczy.activity.R
 import github.leavesczy.activity.adapter.ActivityRecyclerAdapter
 import github.leavesczy.activity.adapter.AppRecyclerAdapter
-import github.leavesczy.activity.extend.canDrawOverlays
-import github.leavesczy.activity.extend.clipboardCopy
-import github.leavesczy.activity.extend.showToast
-import github.leavesczy.activity.holder.AppInfoHolder
+import github.leavesczy.activity.holder.AccessibilityUtils.canDrawOverlays
+import github.leavesczy.activity.holder.AccessibilityUtils.clipboardCopy
+import github.leavesczy.activity.holder.AccessibilityUtils.showToast
+import github.leavesczy.activity.holder.AppInfoLoader
 
 /**
  * @Author: leavesCZY
@@ -27,12 +32,6 @@ import github.leavesczy.activity.holder.AppInfoHolder
  * @Github：https://github.com/leavesCZY
  */
 class ActivityService : AccessibilityService() {
-
-    companion object {
-
-        private const val TAG = "ActivityService"
-
-    }
 
     private var windowView: View? = null
 
@@ -53,12 +52,16 @@ class ActivityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         showFloatingWindow()
-        Log.e(TAG, "onServiceConnected()")
+        log {
+            "onServiceConnected()"
+        }
     }
 
-    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged")
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        Log.e(TAG, "onAccessibilityEvent()")
+        log {
+            "onAccessibilityEvent()"
+        }
         windowView?.let {
             event?.let {
                 val eventType = event.eventType
@@ -67,9 +70,13 @@ class ActivityService : AccessibilityService() {
                     val appName = if (packageName.isBlank()) {
                         ""
                     } else {
-                        AppInfoHolder.getAppName(packageName)
+                        AppInfoLoader.getAppName(packageName)
                     }
-                    tvAppName?.text = "$appName : $packageName"
+                    tvAppName?.text = buildString {
+                        append(appName)
+                        append(" : ")
+                        append(packageName)
+                    }
                     event.className?.let {
                         activityList.add("${++itemIndex}" + " : " + event.className.toString())
                         rvActivityList?.scrollToPosition(
@@ -83,12 +90,16 @@ class ActivityService : AccessibilityService() {
     }
 
     override fun onInterrupt() {
-        Log.e(TAG, "onInterrupt()")
+        log {
+            "onInterrupt()"
+        }
         removeWindow()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e(TAG, "onStartCommand()")
+        log {
+            "onStartCommand()"
+        }
         showFloatingWindow()
         return super.onStartCommand(intent, flags, startId)
     }
@@ -96,7 +107,9 @@ class ActivityService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         removeWindow()
-        Log.e(TAG, "onDestroy()")
+        log {
+            "onDestroy()"
+        }
     }
 
     private fun removeWindow() {
@@ -116,7 +129,6 @@ class ActivityService : AccessibilityService() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
         val layoutView = LayoutInflater.from(this).inflate(R.layout.layout_activity_window, null)
         val ivExtendsWindow = layoutView.findViewById<ImageView>(R.id.ivExtendsWindow)
@@ -144,8 +156,8 @@ class ActivityService : AccessibilityService() {
             AppRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val text = tvAppName.text.toString() + "\n" + activityList[position]
-                clipboardCopy(text)
-                showToast("已复制进程&页面信息")
+                clipboardCopy(msg = text)
+                showToast(msg = "已复制进程&页面信息")
             }
         })
         rvActivityList.adapter = activityRecyclerAdapter
@@ -181,6 +193,7 @@ class ActivityService : AccessibilityService() {
                     x = event.rawX.toInt()
                     y = event.rawY.toInt()
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val nowX = event.rawX.toInt()
                     val nowY = event.rawY.toInt()
@@ -188,13 +201,17 @@ class ActivityService : AccessibilityService() {
                     val movedY = nowY - y
                     x = nowX
                     y = nowY
-                    layoutParams.x = layoutParams.x + movedX
-                    layoutParams.y = layoutParams.y + movedY
+                    layoutParams.x += movedX
+                    layoutParams.y += movedY
                     windowManager.updateViewLayout(view, layoutParams)
                 }
             }
             return false
         }
+    }
+
+    private fun log(log: () -> Any) {
+        Log.e("ActivityService", log().toString())
     }
 
 }
