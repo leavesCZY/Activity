@@ -1,21 +1,26 @@
 [versions]
-android-plugin = "8.4.0"
-kotlin-plugin = "1.9.23"
+android-plugin = "8.4.1"
+kotlin-plugin = "2.0.0"
 
 junit = "4.13.2"
 androidx-junit = "1.1.5"
 androidx-espresso = "3.5.1"
 
-androidx-appcompat = "1.6.1"
+androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.1.4"
 androidx-recyclerview = "1.3.2"
-androidx-lifecycle-runtime = "2.7.0"
+androidx-lifecycle-runtime = "2.8.1"
 
 google-material = "1.12.0"
 
-kotlinx-coroutines = "1.8.0"
+kotlinx-coroutines = "1.8.1"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "android-plugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-plugin" }
 
 [libraries]
+junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
 
@@ -27,9 +32,3 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
-
-junit = { module = "junit:junit", version.ref = "junit" }
-
-[plugins]
-android-application = { id = "com.android.application", version.ref = "android-plugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-plugin" }
